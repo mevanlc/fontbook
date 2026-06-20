@@ -1,0 +1,264 @@
+package com.fontbook.app.ui
+
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.fontbook.app.model.FontItem
+
+private val TABS = listOf("Sample", "Waterfall", "Glyphs", "Metrics", "Alphabet", "Custom")
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DetailScreen(
+    font: FontItem,
+    custom: CustomTextState,
+    onBack: () -> Unit,
+) {
+    val family = rememberFontFamily(font)
+    var selectedTab by rememberSaveable(font.file.path) { mutableIntStateOf(0) }
+    var focusGlyph by rememberSaveable(font.file.path) { mutableStateOf("A") }
+
+    androidx.compose.material3.Scaffold(
+        topBar = {
+            TopAppBar(
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                title = {
+                    Column {
+                        Text(
+                            text = font.family,
+                            style = MaterialTheme.typography.titleLarge,
+                            maxLines = 1,
+                        )
+                        Text(
+                            text = font.style,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                },
+            )
+        },
+    ) { padding ->
+        Column(modifier = Modifier.padding(padding)) {
+            ScrollableTabRow(
+                selectedTabIndex = selectedTab,
+                edgePadding = 12.dp,
+            ) {
+                TABS.forEachIndexed { index, title ->
+                    Tab(
+                        selected = selectedTab == index,
+                        onClick = { selectedTab = index },
+                        text = { Text(title) },
+                    )
+                }
+            }
+            HorizontalDivider()
+
+            when (selectedTab) {
+                0 -> SampleTab(family)
+                1 -> WaterfallTab(family)
+                2 -> GlyphsTab(
+                    family = family,
+                    onGlyphClick = { glyph ->
+                        focusGlyph = glyph
+                        selectedTab = TABS.indexOf("Metrics")
+                    },
+                )
+                3 -> GlyphMetricsView(
+                    font = font,
+                    glyph = focusGlyph,
+                    onGlyphChange = { focusGlyph = it },
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
+                )
+                4 -> AlphabetTab(family)
+                else -> CustomTab(family, custom)
+            }
+        }
+    }
+}
+
+@Composable
+private fun SampleTab(family: FontFamily) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+    ) {
+        Text(Samples.PANGRAM, fontFamily = family, fontSize = 30.sp, color = MaterialTheme.colorScheme.onSurface)
+        Text(Samples.PANGRAM_SHORT, fontFamily = family, fontSize = 22.sp, color = MaterialTheme.colorScheme.onSurface)
+        HorizontalDivider()
+        Text(Samples.PARAGRAPH, fontFamily = family, fontSize = 18.sp, color = MaterialTheme.colorScheme.onSurface)
+    }
+}
+
+@Composable
+private fun WaterfallTab(family: FontFamily) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Samples.WATERFALL_SIZES.forEach { size ->
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = "$size",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.width(32.dp),
+                )
+                Text(
+                    text = Samples.PANGRAM_SHORT,
+                    fontFamily = family,
+                    fontSize = size.sp,
+                    maxLines = 1,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .horizontalScroll(rememberScrollState()),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun GlyphsTab(family: FontFamily, onGlyphClick: (String) -> Unit) {
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(minSize = 60.dp),
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        items(Samples.GLYPHS) { glyph ->
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                onClick = { onGlyphClick(glyph) },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 14.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = glyph,
+                        fontFamily = family,
+                        fontSize = 28.sp,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AlphabetTab(family: FontFamily) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+    ) {
+        SpecimenBlock("Uppercase", Samples.UPPERCASE, family, 26.sp)
+        SpecimenBlock("Lowercase", Samples.LOWERCASE, family, 26.sp)
+        SpecimenBlock("Numerals", Samples.NUMERALS, family, 26.sp)
+        SpecimenBlock("Punctuation", Samples.PUNCTUATION, family, 22.sp)
+    }
+}
+
+@Composable
+private fun SpecimenBlock(
+    label: String,
+    text: String,
+    family: FontFamily,
+    size: androidx.compose.ui.unit.TextUnit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(
+            text = label.uppercase(),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(
+            text = text,
+            fontFamily = family,
+            fontSize = size,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+    }
+}
+
+@Composable
+private fun CustomTab(family: FontFamily, custom: CustomTextState) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
+    ) {
+        CustomTextPanel(custom = custom)
+        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+        Text(
+            text = custom.text.ifBlank { Samples.PANGRAM },
+            fontFamily = family,
+            fontSize = custom.size.sp,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+        )
+    }
+}
