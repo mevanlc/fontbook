@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -34,8 +35,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fontbook.app.model.FontItem
@@ -45,6 +50,7 @@ import com.fontbook.app.model.FontItem
 fun BrowseScreen(
     fonts: List<FontItem>?,
     custom: CustomTextState,
+    listState: LazyListState,
     onFontClick: (FontItem) -> Unit,
 ) {
     var searchOpen by rememberSaveable { mutableStateOf(false) }
@@ -64,7 +70,20 @@ fun BrowseScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text("Fontbook", style = MaterialTheme.typography.titleLarge)
+                        Text(
+                            text = buildAnnotatedString {
+                                append("Font")
+                                withStyle(
+                                    SpanStyle(
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.Bold,
+                                    ),
+                                ) {
+                                    append("Book")
+                                }
+                            },
+                            style = MaterialTheme.typography.titleLarge,
+                        )
                         if (fonts != null) {
                             Text(
                                 text = "${fonts.size} fonts on this device",
@@ -114,6 +133,7 @@ fun BrowseScreen(
                 else -> FontList(
                     fonts = filtered,
                     custom = custom,
+                    listState = listState,
                     onFontClick = onFontClick,
                 )
             }
@@ -142,9 +162,11 @@ private fun SearchField(query: String, onQueryChange: (String) -> Unit) {
 private fun FontList(
     fonts: List<FontItem>,
     custom: CustomTextState,
+    listState: LazyListState,
     onFontClick: (FontItem) -> Unit,
 ) {
     LazyColumn(
+        state = listState,
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(vertical = 4.dp),
     ) {

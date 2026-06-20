@@ -55,8 +55,12 @@ object SystemFontScanner {
             }
         }
 
+        // Alphabetical by the name shown in the list, case-insensitive.
         return items.sortedWith(
-            compareBy({ it.family.lowercase(Locale.ROOT) }, { it.displayName.lowercase(Locale.ROOT) }),
+            compareBy(
+                { it.displayName.lowercase(Locale.ROOT) },
+                { it.file.name.lowercase(Locale.ROOT) },
+            ),
         )
     }
 

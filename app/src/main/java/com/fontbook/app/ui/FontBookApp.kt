@@ -6,8 +6,10 @@ import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -31,6 +33,11 @@ fun FontBookApp() {
     // Hoisted custom-text state, shared between Browse and Detail.
     val custom = rememberCustomTextState()
 
+    // Plain `remember` (not saveable): survives navigation between the list and a
+    // font's detail, but resets on app restart, per the requested behavior.
+    val listState = rememberLazyListState()
+    var detailTab by remember { mutableIntStateOf(0) }
+
     val selected = remember(fonts, selectedPath) {
         val path = selectedPath
         fonts?.firstOrNull { it.file.path == path }
@@ -49,12 +56,15 @@ fun FontBookApp() {
             BrowseScreen(
                 fonts = fonts,
                 custom = custom,
+                listState = listState,
                 onFontClick = { selectedPath = it.file.path },
             )
         } else {
             DetailScreen(
                 font = current,
                 custom = custom,
+                selectedTab = detailTab,
+                onSelectTab = { detailTab = it },
                 onBack = { selectedPath = null },
             )
         }

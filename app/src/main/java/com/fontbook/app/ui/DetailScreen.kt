@@ -30,7 +30,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -42,17 +41,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fontbook.app.model.FontItem
 
-private val TABS = listOf("Sample", "Waterfall", "Glyphs", "Metrics", "Alphabet", "Custom")
+private val TABS = listOf("Sample", "Waterfall", "Glyphs", "Metrics", "Info", "Alphabet", "Custom")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(
     font: FontItem,
     custom: CustomTextState,
+    selectedTab: Int,
+    onSelectTab: (Int) -> Unit,
     onBack: () -> Unit,
 ) {
     val family = rememberFontFamily(font)
-    var selectedTab by rememberSaveable(font.file.path) { mutableIntStateOf(0) }
     var focusGlyph by rememberSaveable(font.file.path) { mutableStateOf("A") }
 
     androidx.compose.material3.Scaffold(
@@ -88,7 +88,7 @@ fun DetailScreen(
                 TABS.forEachIndexed { index, title ->
                     Tab(
                         selected = selectedTab == index,
-                        onClick = { selectedTab = index },
+                        onClick = { onSelectTab(index) },
                         text = { Text(title) },
                     )
                 }
@@ -102,7 +102,7 @@ fun DetailScreen(
                     family = family,
                     onGlyphClick = { glyph ->
                         focusGlyph = glyph
-                        selectedTab = TABS.indexOf("Metrics")
+                        onSelectTab(TABS.indexOf("Metrics"))
                     },
                 )
                 3 -> GlyphMetricsView(
@@ -113,7 +113,13 @@ fun DetailScreen(
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState()),
                 )
-                4 -> AlphabetTab(family)
+                4 -> InfoTab(
+                    font = font,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
+                )
+                5 -> AlphabetTab(family)
                 else -> CustomTab(family, custom)
             }
         }

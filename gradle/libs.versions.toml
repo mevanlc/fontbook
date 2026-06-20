@@ -4,8 +4,10 @@ kotlin = "2.0.21"
 coreKtx = "1.15.0"
 activityCompose = "1.9.3"
 composeBom = "2024.12.01"
+fontbox = "2.0.36"
 
 [libraries]
+fontbox = { group = "org.apache.pdfbox", name = "fontbox", version.ref = "fontbox" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
