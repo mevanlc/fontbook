@@ -203,8 +203,12 @@ private fun FontRow(
             fontFamily = family,
             fontSize = if (custom.enabled) custom.size.sp else 22.sp,
             color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 3,
-            overflow = TextOverflow.Ellipsis,
+            // Custom text can be set very large; keep it to one clipped line so tall
+            // display faces can't wrap and overlap the next line. The default pangram
+            // stays at a comfortable 22sp where wrapping to a few lines looks fine.
+            maxLines = if (custom.enabled) 1 else 3,
+            softWrap = !custom.enabled,
+            overflow = if (custom.enabled) TextOverflow.Clip else TextOverflow.Ellipsis,
             modifier = Modifier.padding(top = 4.dp),
         )
     }
