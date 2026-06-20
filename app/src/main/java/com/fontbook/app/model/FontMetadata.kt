@@ -28,6 +28,8 @@ data class FontMetadata(
     val vendorId: String?,
     val weightClass: String?,
     val widthClass: String?,
+    val familyClass: String?,
+    val panoseFamily: String?,
     val embedding: String?,
     // `head` table
     val created: String?,

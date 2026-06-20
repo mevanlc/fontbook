@@ -55,6 +55,8 @@ fun InfoTab(font: FontItem, modifier: Modifier = Modifier) {
             InfoRow("Designer", data.designer)
             InfoRow("Weight", data.weightClass)
             InfoRow("Width", data.widthClass)
+            InfoRow("Classification", data.familyClass)
+            InfoRow("PANOSE", data.panoseFamily)
 
             SectionDivider()
             Section("Technical")

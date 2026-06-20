@@ -40,6 +40,59 @@ object FontBoxReader {
     private const val ID_LICENSE = 13
     private const val ID_LICENSE_URL = 14
 
+    // OS/2 `sFamilyClass` — high byte: IBM font class.
+    private val FAMILY_CLASSES = mapOf(
+        1 to "Oldstyle Serifs",
+        2 to "Transitional Serifs",
+        3 to "Modern Serifs",
+        4 to "Clarendon Serifs",
+        5 to "Slab Serifs",
+        7 to "Freeform Serifs",
+        8 to "Sans Serif",
+        9 to "Ornamentals",
+        10 to "Scripts",
+        12 to "Symbolic",
+    )
+
+    // OS/2 `sFamilyClass` — low byte: class-specific subclass.
+    private val FAMILY_SUBCLASSES: Map<Int, Map<Int, String>> = mapOf(
+        1 to mapOf(
+            1 to "IBM Rounded Legibility", 2 to "Garalde", 3 to "Venetian",
+            4 to "Modified Venetian", 5 to "Dutch Modern", 6 to "Dutch Traditional",
+            7 to "Contemporary", 8 to "Calligraphic", 15 to "Miscellaneous",
+        ),
+        2 to mapOf(1 to "Direct Line", 2 to "Script", 15 to "Miscellaneous"),
+        3 to mapOf(1 to "Italian", 2 to "Script", 15 to "Miscellaneous"),
+        4 to mapOf(
+            1 to "Clarendon", 2 to "Modern", 3 to "Traditional", 4 to "Newspaper",
+            5 to "Stub Serif", 6 to "Monotone", 7 to "Typewriter", 15 to "Miscellaneous",
+        ),
+        5 to mapOf(
+            1 to "Monotone", 2 to "Humanist", 3 to "Geometric", 4 to "Swiss",
+            5 to "Typewriter", 15 to "Miscellaneous",
+        ),
+        7 to mapOf(1 to "Modern", 15 to "Miscellaneous"),
+        8 to mapOf(
+            1 to "IBM Neo-grotesque Gothic", 2 to "Humanist",
+            3 to "Low-x Round Geometric", 4 to "High-x Round Geometric",
+            5 to "Neo-grotesque Gothic", 6 to "Modified Neo-grotesque Gothic",
+            9 to "Typewriter Gothic", 10 to "Matrix", 15 to "Miscellaneous",
+        ),
+        9 to mapOf(
+            1 to "Engraver", 2 to "Black Letter", 3 to "Decorative",
+            4 to "Three Dimensional", 15 to "Miscellaneous",
+        ),
+        10 to mapOf(
+            1 to "Uncial", 2 to "Brush Joined", 3 to "Formal Joined",
+            4 to "Monotone Joined", 5 to "Calligraphic", 6 to "Brush Unjoined",
+            7 to "Formal Unjoined", 8 to "Monotone Unjoined", 15 to "Miscellaneous",
+        ),
+        12 to mapOf(
+            3 to "Mixed Serif", 6 to "Oldstyle Serif",
+            7 to "Neo-grotesque Sans Serif", 15 to "Miscellaneous",
+        ),
+    )
+
     fun read(file: File): FontMetadata? = try {
         when (readTag(file)) {
             TAG_TTCF -> {
@@ -97,6 +150,8 @@ object FontBoxReader {
             vendorId = os2?.achVendId?.trim()?.takeIf { it.isNotBlank() },
             weightClass = os2?.weightClass?.let(::weightLabel),
             widthClass = os2?.widthClass?.let(::widthLabel),
+            familyClass = os2?.familyClass?.let(::familyClassLabel),
+            panoseFamily = os2?.panose?.let(::panoseFamilyLabel),
             embedding = os2?.fsType?.toInt()?.let(::embeddingLabel),
             created = header?.created?.let(::formatDate),
             modified = header?.modified?.let(::formatDate),
@@ -168,6 +223,32 @@ object FontBoxReader {
             else -> null
         }
         return if (name != null) "$width ($name)" else "$width"
+    }
+
+    /**
+     * Decodes the OS/2 `sFamilyClass` field: the high byte is an IBM font class,
+     * the low byte a class-specific subclass. Returns null when unclassified.
+     */
+    private fun familyClassLabel(value: Int): String? {
+        val classId = (value shr 8) and 0xFF
+        val subId = value and 0xFF
+        val className = FAMILY_CLASSES[classId] ?: return null
+        val subName = FAMILY_SUBCLASSES[classId]?.get(subId)
+            ?.takeIf { subId != 0 } // 0 == "No Classification", not worth repeating
+        return if (subName != null) "$className · $subName" else className
+    }
+
+    /** Decodes the first PANOSE digit (bFamilyType). Returns null when "Any". */
+    private fun panoseFamilyLabel(panose: ByteArray): String? {
+        val type = panose.getOrNull(0)?.toInt()?.and(0xFF) ?: return null
+        return when (type) {
+            1 -> "No Fit"
+            2 -> "Latin Text"
+            3 -> "Latin Hand Written"
+            4 -> "Latin Decorative"
+            5 -> "Latin Symbol"
+            else -> null // 0 == "Any" (the common all-zero default)
+        }
     }
 
     private fun embeddingLabel(fsType: Int): String {
