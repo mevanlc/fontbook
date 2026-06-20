@@ -25,14 +25,23 @@ import com.fontbook.app.model.FontMetadata
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+/** Loading / parsed / unreadable — distinct so a parse failure isn't mistaken for "still loading". */
+private sealed interface MetaState {
+    data object Loading : MetaState
+    data class Ready(val data: FontMetadata) : MetaState
+    data object Failed : MetaState
+}
+
 @Composable
 fun InfoTab(font: FontItem, modifier: Modifier = Modifier) {
-    val metadata by produceState<FontMetadata?>(initialValue = null, key1 = font.file.path) {
-        value = withContext(Dispatchers.IO) { FontBoxReader.read(font.file) }
+    val state by produceState<MetaState>(initialValue = MetaState.Loading, key1 = font.file.path) {
+        value = withContext(Dispatchers.IO) {
+            FontBoxReader.read(font.file)?.let(MetaState::Ready) ?: MetaState.Failed
+        }
     }
 
-    when (val data = metadata) {
-        null -> Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    when (val s = state) {
+        MetaState.Loading -> Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -41,7 +50,10 @@ fun InfoTab(font: FontItem, modifier: Modifier = Modifier) {
                 Text("Reading metadata…", style = MaterialTheme.typography.bodyMedium)
             }
         }
-        else -> Column(modifier = modifier.padding(16.dp)) {
+        MetaState.Failed -> UnreadableInfo(font, modifier)
+        is MetaState.Ready -> {
+            val data = s.data
+            Column(modifier = modifier.padding(16.dp)) {
             Section("Identity")
             InfoRow("Family", data.family)
             InfoRow("Style", data.subfamily)
@@ -81,7 +93,36 @@ fun InfoTab(font: FontItem, modifier: Modifier = Modifier) {
             InfoRow("Name", data.fileName)
             InfoRow("Path", data.filePath)
             InfoRow("Size", formatSize(data.fileSizeBytes))
+            }
         }
+    }
+}
+
+/**
+ * Shown when FontBox can't parse the file (e.g. bitmap-only color emoji fonts that
+ * lack a `glyf`/`loca` table). We still surface the file basics we already hold.
+ */
+@Composable
+private fun UnreadableInfo(font: FontItem, modifier: Modifier = Modifier) {
+    Column(modifier = modifier.padding(16.dp)) {
+        Section("Identity")
+        InfoRow("Family", font.family)
+        InfoRow("Style", font.style)
+
+        SectionDivider()
+        Section("Technical")
+        Text(
+            text = "Detailed metadata isn't available for this font — its tables " +
+                "couldn't be read (common for bitmap color-emoji fonts).",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+
+        SectionDivider()
+        Section("File")
+        InfoRow("Name", font.file.name)
+        InfoRow("Path", font.file.path)
+        InfoRow("Size", formatSize(font.file.length()))
     }
 }
 
