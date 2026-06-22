@@ -1,0 +1,878 @@
+{
+  "adlm": {
+    "langNameEnglish": "Fulani",
+    "langName": "𞤆𞤵𞤤𞤢𞤪",
+    "scriptName": "𞤆𞤵𞤤𞤢𞤪",
+    "scriptNameEnglish": "Adlam",
+    "qbfText": "",
+    "isoLang": "ff"
+  },
+  "ahom": {
+    "langNameEnglish": "Ahom",
+    "langName": "𑜒𑜑𑜨𑜉",
+    "scriptName": "𑜒𑜑𑜨𑜉",
+    "scriptNameEnglish": "Ahom",
+    "qbfText": "",
+    "isoLang": ""
+  },
+  "arab": {
+    "langNameEnglish": "Arabic",
+    "langName": "العربية",
+    "scriptName": "العربية",
+    "scriptNameEnglish": "Arabic",
+    "qbfText": "الثعلب البني السريع يقفز فوق الكلب الكسول",
+    "isoLang": "ar",
+    "more": [
+      {
+        "langNameEnglish": "Persian",
+        "langName": "فارسی",
+        "scriptName": "العربية",
+        "scriptNameEnglish": "Arabic",
+        "qbfText": "روباه قهوه‌ای چابک از روی سگ تنبل می‌پرد",
+        "isoLang": "fa"
+      },
+      {
+        "langNameEnglish": "Urdu",
+        "langName": "اردو",
+        "scriptName": "العربية",
+        "scriptNameEnglish": "Arabic",
+        "qbfText": "تیز بھوری لومڑی سست کتے کے اوپر سے کود جاتی ہے",
+        "isoLang": "ur"
+      }
+    ]
+  },
+  "armn": {
+    "langNameEnglish": "Armenian",
+    "langName": "Հայերեն",
+    "scriptName": "Հայերեն",
+    "scriptNameEnglish": "Armenian",
+    "qbfText": "Արագ դարչնագույն աղվեսը ցատկում է ծույլ շան վրայով",
+    "isoLang": "hy"
+  },
+  "avst": {
+    "langNameEnglish": "Avestan",
+    "langName": "𐬀𐬬𐬉𐬯𐬙𐬁",
+    "scriptName": "𐬀𐬬𐬉𐬯𐬙𐬁",
+    "scriptNameEnglish": "Avestan",
+    "qbfText": "",
+    "isoLang": "ae"
+  },
+  "bali": {
+    "langNameEnglish": "Balinese",
+    "langName": "ᬩᬮᬶ",
+    "scriptName": "ᬩᬮᬶ",
+    "scriptNameEnglish": "Balinese",
+    "qbfText": "",
+    "isoLang": ""
+  },
+  "bamu": {
+    "langNameEnglish": "Bamum",
+    "langName": "ꚠꚯꚳ",
+    "scriptName": "ꚠꚯꚳ",
+    "scriptNameEnglish": "Bamum",
+    "qbfText": "",
+    "isoLang": "",
+    "isoBcp47": "bax"
+  },
+  "bass": {
+    "langNameEnglish": "Bassa",
+    "langName": "𖫐𖫑𖫔",
+    "scriptName": "𖫐𖫑𖫔",
+    "scriptNameEnglish": "Bassa Vah",
+    "qbfText": "",
+    "isoLang": ""
+  },
+  "beng": {
+    "langNameEnglish": "Bengali",
+    "langName": "বাংলা",
+    "scriptName": "বাংলা লিপি",
+    "scriptNameEnglish": "Bengali",
+    "qbfText": "দ্রুত বাদামী শিয়াল অলস কুকুরের উপর দিয়ে লাফ দেয়",
+    "isoLang": "bn"
+  },
+  "bhks": {
+    "langNameEnglish": "Sanskrit",
+    "langName": "𑰥𑰹𑰎𑰿𑰬𑰲𑰎𑰱",
+    "scriptName": "𑰥𑰹𑰎𑰿𑰬𑰲𑰎𑰱",
+    "scriptNameEnglish": "Bhaiksuki",
+    "qbfText": "",
+    "isoLang": "sa"
+  },
+  "bng2": {
+    "langNameEnglish": "Bengali",
+    "langName": "বাংলা",
+    "scriptName": "বাংলা লিপি",
+    "scriptNameEnglish": "Bengali",
+    "qbfText": "দ্রুত বাদামী শিয়াল অলস কুকুরের উপর দিয়ে লাফ দেয়",
+    "isoLang": "bn"
+  },
+  "cakm": {
+    "langNameEnglish": "Chakma",
+    "langName": "𑄌𑄋𑄴𑄟𑄳𑄦",
+    "scriptName": "𑄌𑄋𑄴𑄟𑄳𑄦",
+    "scriptNameEnglish": "Chakma",
+    "qbfText": "",
+    "isoLang": "",
+    "isoBcp47": "ccp"
+  },
+  "cans": {
+    "langNameEnglish": "Inuktitut",
+    "langName": "ᐃᓄᒃᑎᑐᑦ",
+    "scriptName": "ᖃᓂᐅᔮᖅᐸᐃᑦ",
+    "scriptNameEnglish": "Canadian Aboriginal Syllabics",
+    "qbfText": "",
+    "isoLang": "iu"
+  },
+  "cham": {
+    "langNameEnglish": "Cham",
+    "langName": "ꨌꩌ",
+    "scriptName": "ꨌꩌ",
+    "scriptNameEnglish": "Cham",
+    "qbfText": "",
+    "isoLang": ""
+  },
+  "cher": {
+    "langNameEnglish": "Cherokee",
+    "langName": "ᏣᎳᎩ",
+    "scriptName": "ᏣᎳᎩ ᏗᎪᏪᎵ",
+    "scriptNameEnglish": "Cherokee",
+    "qbfText": "",
+    "isoLang": "",
+    "isoBcp47": "chr"
+  },
+  "copt": {
+    "langNameEnglish": "Coptic",
+    "langName": "ⲘⲉⲧⲢⲉⲙⲛ̀ⲭⲏⲙⲓ",
+    "scriptName": "ⲘⲉⲧⲢⲉⲙⲛ̀ⲭⲏⲙⲓ",
+    "scriptNameEnglish": "Coptic",
+    "qbfText": "",
+    "isoLang": ""
+  },
+  "cyrl": {
+    "langNameEnglish": "Russian",
+    "langName": "Русский",
+    "scriptName": "Кириллица",
+    "scriptNameEnglish": "Cyrillic",
+    "qbfText": "Быстрая коричневая лиса прыгает через ленивую собаку",
+    "isoLang": "ru",
+    "more": [
+      {
+        "langNameEnglish": "Ukrainian",
+        "langName": "Українська",
+        "scriptName": "Кириллица",
+        "scriptNameEnglish": "Cyrillic",
+        "qbfText": "Швидка бура лисиця стрибає через лінивого пса",
+        "isoLang": "uk"
+      },
+      {
+        "langNameEnglish": "Serbian",
+        "langName": "Српски",
+        "scriptName": "Кириллица",
+        "scriptNameEnglish": "Cyrillic",
+        "qbfText": "Брза смеђа лисица прескаче лењог пса",
+        "isoLang": "sr",
+        "isoBcp47": "sr-Cyrl"
+      },
+      {
+        "langNameEnglish": "Bulgarian",
+        "langName": "Български",
+        "scriptName": "Кириллица",
+        "scriptNameEnglish": "Cyrillic",
+        "qbfText": "Бързата кафява лисица прескача мързеливото куче",
+        "isoLang": "bg"
+      }
+    ]
+  },
+  "dev2": {
+    "langNameEnglish": "Hindi",
+    "langName": "हिन्दी",
+    "scriptName": "देवनागरी",
+    "scriptNameEnglish": "Devanagari",
+    "qbfText": "तेज़ भूरी लोमड़ी आलसी कुत्ते के ऊपर से कूदती है",
+    "isoLang": "hi",
+    "more": [
+      {
+        "langNameEnglish": "Marathi",
+        "langName": "मराठी",
+        "scriptName": "देवनागरी",
+        "scriptNameEnglish": "Devanagari",
+        "qbfText": "चपळ तपकिरी कोल्हा आळशी कुत्र्यावरून उडी मारतो",
+        "isoLang": "mr"
+      },
+      {
+        "langNameEnglish": "Nepali",
+        "langName": "नेपाली",
+        "scriptName": "देवनागरी",
+        "scriptNameEnglish": "Devanagari",
+        "qbfText": "छिटो खैरो फ्याउरो अल्छी कुकुरमाथि उफ्रन्छ",
+        "isoLang": "ne"
+      },
+      {
+        "langNameEnglish": "Sanskrit",
+        "langName": "संस्कृतम्",
+        "scriptName": "देवनागरी",
+        "scriptNameEnglish": "Devanagari",
+        "qbfText": "द्रुतः पिङ्गलः लोमशः अलसं श्वानम् अतिलङ्घति",
+        "isoLang": "sa"
+      }
+    ]
+  },
+  "deva": {
+    "langNameEnglish": "Hindi",
+    "langName": "हिन्दी",
+    "scriptName": "देवनागरी",
+    "scriptNameEnglish": "Devanagari",
+    "qbfText": "तेज़ भूरी लोमड़ी आलसी कुत्ते के ऊपर से कूदती है",
+    "isoLang": "hi",
+    "more": [
+      {
+        "langNameEnglish": "Marathi",
+        "langName": "मराठी",
+        "scriptName": "देवनागरी",
+        "scriptNameEnglish": "Devanagari",
+        "qbfText": "चपळ तपकिरी कोल्हा आळशी कुत्र्यावरून उडी मारतो",
+        "isoLang": "mr"
+      },
+      {
+        "langNameEnglish": "Nepali",
+        "langName": "नेपाली",
+        "scriptName": "देवनागरी",
+        "scriptNameEnglish": "Devanagari",
+        "qbfText": "छिटो खैरो फ्याउरो अल्छी कुकुरमाथि उफ्रन्छ",
+        "isoLang": "ne"
+      },
+      {
+        "langNameEnglish": "Sanskrit",
+        "langName": "संस्कृतम्",
+        "scriptName": "देवनागरी",
+        "scriptNameEnglish": "Devanagari",
+        "qbfText": "द्रुतः पिङ्गलः लोमशः अलसं श्वानम् अतिलङ्घति",
+        "isoLang": "sa"
+      }
+    ]
+  },
+  "dogr": {
+    "langNameEnglish": "Dogri",
+    "langName": "𑠠𑠵𑠌𑠤𑠮",
+    "scriptName": "𑠠𑠵𑠌𑠤𑠮",
+    "scriptNameEnglish": "Dogra",
+    "qbfText": "",
+    "isoLang": "doi",
+    "isoBcp47": "doi"
+  },
+  "elba": {
+    "langNameEnglish": "Albanian",
+    "langName": "𐔇𐔐𐔄𐔇𐔆",
+    "scriptName": "𐔇𐔐𐔄𐔇𐔆",
+    "scriptNameEnglish": "Elbasan",
+    "qbfText": "",
+    "isoLang": "sq"
+  },
+  "ethi": {
+    "langNameEnglish": "Amharic",
+    "langName": "አማርኛ",
+    "scriptName": "ግዕዝ",
+    "scriptNameEnglish": "Ethiopic",
+    "qbfText": "ፈጣኑ ቡናማ ቀበሮ በሰነፉ ውሻ ላይ ይዘላል",
+    "isoLang": "am",
+    "more": [
+      {
+        "langNameEnglish": "Tigrinya",
+        "langName": "ትግርኛ",
+        "scriptName": "ግዕዝ",
+        "scriptNameEnglish": "Ethiopic",
+        "qbfText": "እቲ ቅልጡፍ ቡናዊ ወኻርያ ኣብ ልዕሊ እቲ ሃካይ ከልቢ ይዘልል",
+        "isoLang": "ti"
+      }
+    ]
+  },
+  "geor": {
+    "langNameEnglish": "Georgian",
+    "langName": "ქართული",
+    "scriptName": "ქართული",
+    "scriptNameEnglish": "Georgian",
+    "qbfText": "სწრაფი ყავისფერი მელა ხტება ზარმაცი ძაღლის თავზე",
+    "isoLang": "ka"
+  },
+  "gjr2": {
+    "langNameEnglish": "Gujarati",
+    "langName": "ગુજરાતી",
+    "scriptName": "ગુજરાતી લિપિ",
+    "scriptNameEnglish": "Gujarati",
+    "qbfText": "ઝડપી કથ્થઈ શિયાળ આળસુ કૂતરા ઉપર કૂદકો મારે છે",
+    "isoLang": "gu"
+  },
+  "gong": {
+    "langNameEnglish": "Gondi",
+    "langName": "𑵶𑶁𑵱𑵳",
+    "scriptName": "𑵶𑶁𑵱𑵳",
+    "scriptNameEnglish": "Gunjala Gondi",
+    "qbfText": "",
+    "isoLang": ""
+  },
+  "gonm": {
+    "langNameEnglish": "Gondi",
+    "langName": "𑴎𑴻𑴥𑴱",
+    "scriptName": "𑴎𑴻𑴥𑴱",
+    "scriptNameEnglish": "Masaram Gondi",
+    "qbfText": "",
+    "isoLang": ""
+  },
+  "goth": {
+    "langNameEnglish": "Gothic",
+    "langName": "𐌲𐌿𐍄𐌹𐍃𐌺𐌰",
+    "scriptName": "𐌲𐌿𐍄𐌹𐍃𐌺𐌰",
+    "scriptNameEnglish": "Gothic",
+    "qbfText": "",
+    "isoLang": ""
+  },
+  "gran": {
+    "langNameEnglish": "Sanskrit",
+    "langName": "𑌗𑍍𑌰𑌨𑍍𑌥",
+    "scriptName": "𑌗𑍍𑌰𑌨𑍍𑌥",
+    "scriptNameEnglish": "Grantha",
+    "qbfText": "",
+    "isoLang": "sa"
+  },
+  "grek": {
+    "langNameEnglish": "Greek",
+    "langName": "Ελληνικά",
+    "scriptName": "Ελληνικό αλφάβητο",
+    "scriptNameEnglish": "Greek",
+    "qbfText": "Η γρήγορη καφέ αλεπού πηδάει πάνω από το τεμπέλικο σκυλί",
+    "isoLang": "el"
+  },
+  "gujr": {
+    "langNameEnglish": "Gujarati",
+    "langName": "ગુજરાતી",
+    "scriptName": "ગુજરાતી લિપિ",
+    "scriptNameEnglish": "Gujarati",
+    "qbfText": "ઝડપી કથ્થઈ શિયાળ આળસુ કૂતરા ઉપર કૂદકો મારે છે",
+    "isoLang": "gu"
+  },
+  "gur2": {
+    "langNameEnglish": "Punjabi",
+    "langName": "ਪੰਜਾਬੀ",
+    "scriptName": "ਗੁਰਮੁਖੀ",
+    "scriptNameEnglish": "Gurmukhi",
+    "qbfText": "ਤੇਜ਼ ਭੂਰੀ ਲੂੰਬੜੀ ਆਲਸੀ ਕੁੱਤੇ ਉੱਤੋਂ ਛਾਲ ਮਾਰਦੀ ਹੈ",
+    "isoLang": "pa",
+    "isoBcp47": "pa-Guru"
+  },
+  "guru": {
+    "langNameEnglish": "Punjabi",
+    "langName": "ਪੰਜਾਬੀ",
+    "scriptName": "ਗੁਰਮੁਖੀ",
+    "scriptNameEnglish": "Gurmukhi",
+    "qbfText": "ਤੇਜ਼ ਭੂਰੀ ਲੂੰਬੜੀ ਆਲਸੀ ਕੁੱਤੇ ਉੱਤੋਂ ਛਾਲ ਮਾਰਦੀ ਹੈ",
+    "isoLang": "pa",
+    "isoBcp47": "pa-Guru"
+  },
+  "hang": {
+    "langNameEnglish": "Korean",
+    "langName": "한국어",
+    "scriptName": "한글",
+    "scriptNameEnglish": "Hangul",
+    "qbfText": "빠른 갈색 여우가 게으른 개를 뛰어넘는다",
+    "isoLang": "ko"
+  },
+  "hani": {
+    "langNameEnglish": "Chinese",
+    "langName": "中文",
+    "scriptName": "漢字",
+    "scriptNameEnglish": "Han",
+    "qbfText": "敏捷的棕色狐狸跳过懒狗",
+    "isoLang": "zh",
+    "more": [
+      {
+        "langNameEnglish": "Cantonese",
+        "langName": "粵語",
+        "scriptName": "漢字",
+        "scriptNameEnglish": "Han",
+        "qbfText": "嗰隻敏捷嘅棕色狐狸跳過隻懶狗",
+        "isoLang": "",
+        "isoBcp47": "yue"
+      }
+    ]
+  },
+  "hebr": {
+    "langNameEnglish": "Hebrew",
+    "langName": "עברית",
+    "scriptName": "אָלֶף־בֵּית עִבְרִי",
+    "scriptNameEnglish": "Hebrew",
+    "qbfText": "השועל החום המהיר קופץ מעל הכלב העצלן",
+    "isoLang": "he",
+    "more": [
+      {
+        "langNameEnglish": "Yiddish",
+        "langName": "ייִדיש",
+        "scriptName": "אָלֶף־בֵּית עִבְרִי",
+        "scriptNameEnglish": "Hebrew",
+        "qbfText": "דער פֿלינקער ברוינער פֿוקס שפּרינגט איבער דעם פֿוילן הונט",
+        "isoLang": "yi"
+      }
+    ]
+  },
+  "hmng": {
+    "langNameEnglish": "Hmong",
+    "langName": "𖬖𖬰𖬞𖬰𖬚𖬵",
+    "scriptName": "𖬖𖬰𖬞𖬰𖬚𖬵",
+    "scriptNameEnglish": "Pahawh Hmong",
+    "qbfText": "",
+    "isoLang": ""
+  },
+  "hmnp": {
+    "langNameEnglish": "Hmong",
+    "langName": "𞄀𞄩𞄄",
+    "scriptName": "𞄀𞄩𞄄",
+    "scriptNameEnglish": "Nyiakeng Puachue Hmong",
+    "qbfText": "",
+    "isoLang": ""
+  },
+  "java": {
+    "langNameEnglish": "Javanese",
+    "langName": "ꦧꦱꦗꦮ",
+    "scriptName": "ꦄꦏ꧀ꦱꦫꦗꦮ",
+    "scriptNameEnglish": "Javanese",
+    "qbfText": "",
+    "isoLang": "jv"
+  },
+  "kali": {
+    "langNameEnglish": "Kayah Li",
+    "langName": "ꤊꤛꤢꤛꤞꤛ",
+    "scriptName": "ꤊꤛꤢꤛꤞꤛ",
+    "scriptNameEnglish": "Kayah Li",
+    "qbfText": "",
+    "isoLang": ""
+  },
+  "kana": {
+    "langNameEnglish": "Japanese",
+    "langName": "日本語",
+    "scriptName": "かな",
+    "scriptNameEnglish": "Kana",
+    "qbfText": "すばしっこい茶色のキツネが怠け者の犬を飛び越える",
+    "isoLang": "ja"
+  },
+  "khmr": {
+    "langNameEnglish": "Khmer",
+    "langName": "ខ្មែរ",
+    "scriptName": "អក្សរខ្មែរ",
+    "scriptNameEnglish": "Khmer",
+    "qbfText": "កញ្ជ្រោងពណ៌ត្នោតរហ័សលោតលើឆ្កែដែលខ្ជិល",
+    "isoLang": "km"
+  },
+  "khoj": {
+    "langNameEnglish": "Sindhi",
+    "langName": "𑈎𑈲𑈚𑈭",
+    "scriptName": "𑈎𑈲𑈚𑈭",
+    "scriptNameEnglish": "Khojki",
+    "qbfText": "",
+    "isoLang": "sd",
+    "isoBcp47": "sd-Khoj"
+  },
+  "knd2": {
+    "langNameEnglish": "Kannada",
+    "langName": "ಕನ್ನಡ",
+    "scriptName": "ಕನ್ನಡ ಲಿಪಿ",
+    "scriptNameEnglish": "Kannada",
+    "qbfText": "ವೇಗದ ಕಂದು ನರಿ ಸೋಮಾರಿ ನಾಯಿಯ ಮೇಲೆ ಜಿಗಿಯುತ್ತದೆ",
+    "isoLang": "kn"
+  },
+  "knda": {
+    "langNameEnglish": "Kannada",
+    "langName": "ಕನ್ನಡ",
+    "scriptName": "ಕನ್ನಡ ಲಿಪಿ",
+    "scriptNameEnglish": "Kannada",
+    "qbfText": "ವೇಗದ ಕಂದು ನರಿ ಸೋಮಾರಿ ನಾಯಿಯ ಮೇಲೆ ಜಿಗಿಯುತ್ತದೆ",
+    "isoLang": "kn"
+  },
+  "lao": {
+    "langNameEnglish": "Lao",
+    "langName": "ລາວ",
+    "scriptName": "ອັກສອນລາວ",
+    "scriptNameEnglish": "Lao",
+    "qbfText": "ໝາຈິ້ງຈອກສີນ້ຳຕານທີ່ວ່ອງໄວກະໂດດຂ້າມໝາທີ່ຂີ້ຄ້ານ",
+    "isoLang": "lo"
+  },
+  "latn": {
+    "langNameEnglish": "English",
+    "langName": "English",
+    "scriptName": "Latin",
+    "scriptNameEnglish": "Latin",
+    "qbfText": "The quick brown fox jumps over the lazy dog",
+    "isoLang": "en",
+    "more": [
+      {
+        "langNameEnglish": "Spanish",
+        "langName": "Español",
+        "scriptName": "Latin",
+        "scriptNameEnglish": "Latin",
+        "qbfText": "El veloz zorro marrón salta sobre el perro perezoso",
+        "isoLang": "es"
+      },
+      {
+        "langNameEnglish": "French",
+        "langName": "Français",
+        "scriptName": "Latin",
+        "scriptNameEnglish": "Latin",
+        "qbfText": "Le vif renard brun saute par-dessus le chien paresseux",
+        "isoLang": "fr"
+      },
+      {
+        "langNameEnglish": "German",
+        "langName": "Deutsch",
+        "scriptName": "Latin",
+        "scriptNameEnglish": "Latin",
+        "qbfText": "Der schnelle braune Fuchs springt über den faulen Hund",
+        "isoLang": "de"
+      },
+      {
+        "langNameEnglish": "Vietnamese",
+        "langName": "Tiếng Việt",
+        "scriptName": "Latin",
+        "scriptNameEnglish": "Latin",
+        "qbfText": "Con cáo nâu nhanh nhẹn nhảy qua con chó lười",
+        "isoLang": "vi"
+      }
+    ]
+  },
+  "mand": {
+    "langNameEnglish": "Mandaic",
+    "langName": "ࡌࡀࡍࡃࡀࡉࡉࡀ",
+    "scriptName": "ࡌࡀࡍࡃࡀࡉࡉࡀ",
+    "scriptNameEnglish": "Mandaic",
+    "qbfText": "",
+    "isoLang": ""
+  },
+  "mani": {
+    "langNameEnglish": "Middle Persian",
+    "langName": "𐫖𐫀𐫗𐫏",
+    "scriptName": "𐫖𐫀𐫗𐫏",
+    "scriptNameEnglish": "Manichaean",
+    "qbfText": "",
+    "isoLang": ""
+  },
+  "marc": {
+    "langNameEnglish": "Zhang-Zhung",
+    "langName": "𑱱𑲩𑲏",
+    "scriptName": "𑱱𑲩𑲏",
+    "scriptNameEnglish": "Marchen",
+    "qbfText": "",
+    "isoLang": ""
+  },
+  "medf": {
+    "langNameEnglish": "Medefaidrin",
+    "langName": "𖹀𖹡𖹥",
+    "scriptName": "𖹀𖹡𖹥",
+    "scriptNameEnglish": "Medefaidrin",
+    "qbfText": "",
+    "isoLang": ""
+  },
+  "merc": {
+    "langNameEnglish": "Meroitic",
+    "langName": "𐦠𐦡𐦢",
+    "scriptName": "𐦠𐦡𐦢",
+    "scriptNameEnglish": "Meroitic Cursive",
+    "qbfText": "",
+    "isoLang": ""
+  },
+  "mlm2": {
+    "langNameEnglish": "Malayalam",
+    "langName": "മലയാളം",
+    "scriptName": "മലയാളലിപി",
+    "scriptNameEnglish": "Malayalam",
+    "qbfText": "വേഗതയുള്ള തവിട്ടുനിറത്തിലുള്ള കുറുക്കൻ മടിയനായ നായയ്ക്ക് മുകളിലൂടെ ചാടുന്നു",
+    "isoLang": "ml"
+  },
+  "mlym": {
+    "langNameEnglish": "Malayalam",
+    "langName": "മലയാളം",
+    "scriptName": "മലയാളലിപി",
+    "scriptNameEnglish": "Malayalam",
+    "qbfText": "വേഗതയുള്ള തവിട്ടുനിറത്തിലുള്ള കുറുക്കൻ മടിയനായ നായയ്ക്ക് മുകളിലൂടെ ചാടുന്നു",
+    "isoLang": "ml"
+  },
+  "modi": {
+    "langNameEnglish": "Marathi",
+    "langName": "𑘦𑘻𑘚𑘲",
+    "scriptName": "𑘦𑘻𑘚𑘲",
+    "scriptNameEnglish": "Modi",
+    "qbfText": "",
+    "isoLang": "mr"
+  },
+  "mong": {
+    "langNameEnglish": "Mongolian",
+    "langName": "ᠮᠣᠩᠭᠣᠯ",
+    "scriptName": "ᠮᠣᠩᠭᠣᠯ ᠪᠢᠴᠢᠭ",
+    "scriptNameEnglish": "Mongolian",
+    "qbfText": "ᠬᠤᠷᠳᠤᠨ ᠬᠦᠷᠡᠩ ᠦᠨᠡᠭᠡ ᠵᠠᠯᠬᠠᠭᠤ ᠨᠣᠬᠠᠢ ᠶᠢ ᠳᠠᠪᠠᠨ ᠦᠰᠦᠷᠦᠨ᠎ᠡ",
+    "isoLang": "mn"
+  },
+  "musc": {
+    "langNameEnglish": "",
+    "langName": "Musical Notation",
+    "scriptName": "Musical Notation",
+    "scriptNameEnglish": "Musical Symbols",
+    "qbfText": "𝄞 𝅘𝅥 𝅗𝅥 𝅘𝅥𝅮 𝄢",
+    "isoLang": ""
+  },
+  "mym2": {
+    "langNameEnglish": "Burmese",
+    "langName": "မြန်မာ",
+    "scriptName": "မြန်မာအက္ခရာ",
+    "scriptNameEnglish": "Myanmar",
+    "qbfText": "လျင်မြန်သော အညိုရောင်မြေခွေးသည် ပျင်းရိသော ခွေးကို ကျော်ခုန်သည်",
+    "isoLang": "my"
+  },
+  "newa": {
+    "langNameEnglish": "Newari",
+    "langName": "𑐣𑐾𑐰𑐵𑑅",
+    "scriptName": "𑐣𑐾𑐰𑐵𑑅",
+    "scriptNameEnglish": "Newa",
+    "qbfText": "",
+    "isoLang": "new",
+    "isoBcp47": "new"
+  },
+  "nko": {
+    "langNameEnglish": "Manding",
+    "langName": "ߒߞߏ",
+    "scriptName": "ߒߞߏ",
+    "scriptNameEnglish": "N'Ko",
+    "qbfText": "",
+    "isoLang": "",
+    "isoBcp47": "nqo"
+  },
+  "ory2": {
+    "langNameEnglish": "Odia",
+    "langName": "ଓଡ଼ିଆ",
+    "scriptName": "ଓଡ଼ିଆ ଲିପି",
+    "scriptNameEnglish": "Oriya",
+    "qbfText": "ଦ୍ରୁତ ବାଦାମୀ ଶିଆଳ ଅଳସୁଆ କୁକୁର ଉପରେ ଡେଇଁ ଯାଏ",
+    "isoLang": "or"
+  },
+  "orya": {
+    "langNameEnglish": "Odia",
+    "langName": "ଓଡ଼ିଆ",
+    "scriptName": "ଓଡ଼ିଆ ଲିପି",
+    "scriptNameEnglish": "Oriya",
+    "qbfText": "ଦ୍ରୁତ ବାଦାମୀ ଶିଆଳ ଅଳସୁଆ କୁକୁର ଉପରେ ଡେଇଁ ଯାଏ",
+    "isoLang": "or"
+  },
+  "osge": {
+    "langNameEnglish": "Osage",
+    "langName": "𐓏𐓘𐓻𐓘𐓻𐓟",
+    "scriptName": "𐓏𐓘𐓻𐓘𐓻𐓟",
+    "scriptNameEnglish": "Osage",
+    "qbfText": "",
+    "isoLang": "",
+    "isoBcp47": "osa"
+  },
+  "palm": {
+    "langNameEnglish": "Palmyrene Aramaic",
+    "langName": "𐡰𐡫𐡬",
+    "scriptName": "𐡰𐡫𐡬",
+    "scriptNameEnglish": "Palmyrene",
+    "qbfText": "",
+    "isoLang": ""
+  },
+  "pauc": {
+    "langNameEnglish": "Zo",
+    "langName": "𑫔𑫞𑫅",
+    "scriptName": "𑫔𑫞𑫅",
+    "scriptNameEnglish": "Pau Cin Hau",
+    "qbfText": "",
+    "isoLang": ""
+  },
+  "perm": {
+    "langNameEnglish": "Komi",
+    "langName": "𐍐𐍝𐍑𐍣𐍒",
+    "scriptName": "𐍐𐍝𐍑𐍣𐍒",
+    "scriptNameEnglish": "Old Permic",
+    "qbfText": "",
+    "isoLang": "kv"
+  },
+  "phag": {
+    "langNameEnglish": "Mongolian",
+    "langName": "ꡎꡆꡛ",
+    "scriptName": "ꡎꡆꡛ",
+    "scriptNameEnglish": "Phags-pa",
+    "qbfText": "",
+    "isoLang": ""
+  },
+  "phli": {
+    "langNameEnglish": "Middle Persian",
+    "langName": "𐭯𐭧𐭫𐭥𐭩",
+    "scriptName": "𐭯𐭧𐭫𐭥𐭩",
+    "scriptNameEnglish": "Inscriptional Pahlavi",
+    "qbfText": "",
+    "isoLang": ""
+  },
+  "plrd": {
+    "langNameEnglish": "Miao",
+    "langName": "𖼀𖽰",
+    "scriptName": "𖼀𖽰",
+    "scriptNameEnglish": "Miao (Pollard)",
+    "qbfText": "",
+    "isoLang": ""
+  },
+  "prti": {
+    "langNameEnglish": "Parthian",
+    "langName": "𐭐𐭓𐭕𐭉",
+    "scriptName": "𐭐𐭓𐭕𐭉",
+    "scriptNameEnglish": "Inscriptional Parthian",
+    "qbfText": "",
+    "isoLang": ""
+  },
+  "rohg": {
+    "langNameEnglish": "Rohingya",
+    "langName": "𐴓𐴠𐴌𐴧𐴝",
+    "scriptName": "𐴓𐴠𐴌𐴧𐴝",
+    "scriptNameEnglish": "Hanifi Rohingya",
+    "qbfText": "",
+    "isoLang": "",
+    "isoBcp47": "rhg"
+  },
+  "samr": {
+    "langNameEnglish": "Samaritan Aramaic",
+    "langName": "ࠀࠓࠌࠉ",
+    "scriptName": "ࠀࠓࠌࠉ",
+    "scriptNameEnglish": "Samaritan",
+    "qbfText": "",
+    "isoLang": ""
+  },
+  "shrd": {
+    "langNameEnglish": "Kashmiri",
+    "langName": "𑆯𑆳𑆫𑆢",
+    "scriptName": "𑆯𑆳𑆫𑆢",
+    "scriptNameEnglish": "Sharada",
+    "qbfText": "",
+    "isoLang": "ks",
+    "isoBcp47": "ks-Shrd"
+  },
+  "sinh": {
+    "langNameEnglish": "Sinhala",
+    "langName": "සිංහල",
+    "scriptName": "සිංහල අක්ෂර",
+    "scriptNameEnglish": "Sinhala",
+    "qbfText": "වේගවත් දුඹුරු හිවලා කම්මැලි බල්ලා උඩින් පනියි",
+    "isoLang": "si"
+  },
+  "soyo": {
+    "langNameEnglish": "Sanskrit",
+    "langName": "𑩐𑩑𑩒",
+    "scriptName": "𑩐𑩑𑩒",
+    "scriptNameEnglish": "Soyombo",
+    "qbfText": "",
+    "isoLang": ""
+  },
+  "syrc": {
+    "langNameEnglish": "Syriac",
+    "langName": "ܣܘܪܝܝܐ",
+    "scriptName": "ܟܬܒܐ ܣܘܪܝܝܐ",
+    "scriptNameEnglish": "Syriac",
+    "qbfText": "",
+    "isoLang": "",
+    "isoBcp47": "syr"
+  },
+  "takr": {
+    "langNameEnglish": "Dogri",
+    "langName": "𑚔𑚭𑚊𑚤𑚯",
+    "scriptName": "𑚔𑚭𑚊𑚤𑚯",
+    "scriptNameEnglish": "Takri",
+    "qbfText": "",
+    "isoLang": ""
+  },
+  "talu": {
+    "langNameEnglish": "Tai Lue",
+    "langName": "ᦟᦹᧉᦴ",
+    "scriptName": "ᦟᦹᧉᦴ",
+    "scriptNameEnglish": "New Tai Lue",
+    "qbfText": "",
+    "isoLang": "",
+    "isoBcp47": "khb"
+  },
+  "taml": {
+    "langNameEnglish": "Tamil",
+    "langName": "தமிழ்",
+    "scriptName": "தமிழ் எழுத்து",
+    "scriptNameEnglish": "Tamil",
+    "qbfText": "விரைவான பழுப்பு நிற நரி சோம்பேறி நாயின் மீது தாவுகிறது",
+    "isoLang": "ta"
+  },
+  "tel2": {
+    "langNameEnglish": "Telugu",
+    "langName": "తెలుగు",
+    "scriptName": "తెలుగు లిపి",
+    "scriptNameEnglish": "Telugu",
+    "qbfText": "వేగవంతమైన గోధుమరంగు నక్క సోమరి కుక్క మీదుగా దూకుతుంది",
+    "isoLang": "te"
+  },
+  "telu": {
+    "langNameEnglish": "Telugu",
+    "langName": "తెలుగు",
+    "scriptName": "తెలుగు లిపి",
+    "scriptNameEnglish": "Telugu",
+    "qbfText": "వేగవంతమైన గోధుమరంగు నక్క సోమరి కుక్క మీదుగా దూకుతుంది",
+    "isoLang": "te"
+  },
+  "thaa": {
+    "langNameEnglish": "Dhivehi",
+    "langName": "ދިވެހި",
+    "scriptName": "ތާނަ",
+    "scriptNameEnglish": "Thaana",
+    "qbfText": "ހަލުވި މުށިކުލައިގެ ފައުވައް ކަންނެތް ކުއްތާގެ މަތިން ފުންމާލައެވެ",
+    "isoLang": "dv"
+  },
+  "thai": {
+    "langNameEnglish": "Thai",
+    "langName": "ไทย",
+    "scriptName": "อักษรไทย",
+    "scriptNameEnglish": "Thai",
+    "qbfText": "สุนัขจิ้งจอกสีน้ำตาลที่ว่องไวกระโดดข้ามสุนัขขี้เกียจ",
+    "isoLang": "th"
+  },
+  "tibt": {
+    "langNameEnglish": "Tibetan",
+    "langName": "བོད་སྐད་",
+    "scriptName": "བོད་ཡིག",
+    "scriptNameEnglish": "Tibetan",
+    "qbfText": "མགྱོགས་པའི་ཝ་སྨུག་པོ་དེ་སྙོམ་ལས་ཀྱི་ཁྱི་ལ་མཆོངས།",
+    "isoLang": "bo",
+    "more": [
+      {
+        "langNameEnglish": "Dzongkha",
+        "langName": "རྫོང་ཁ",
+        "scriptName": "བོད་ཡིག",
+        "scriptNameEnglish": "Tibetan",
+        "qbfText": "",
+        "isoLang": "dz"
+      }
+    ]
+  },
+  "tml2": {
+    "langNameEnglish": "Tamil",
+    "langName": "தமிழ்",
+    "scriptName": "தமிழ் எழுத்து",
+    "scriptNameEnglish": "Tamil",
+    "qbfText": "விரைவான பழுப்பு நிற நரி சோம்பேறி நாயின் மீது தாவுகிறது",
+    "isoLang": "ta"
+  },
+  "wara": {
+    "langNameEnglish": "Ho",
+    "langName": "𑢹𑣉𑣉",
+    "scriptName": "𑢹𑣉𑣉",
+    "scriptNameEnglish": "Warang Citi",
+    "qbfText": "",
+    "isoLang": "",
+    "isoBcp47": "hoc"
+  },
+  "wcho": {
+    "langNameEnglish": "Wancho",
+    "langName": "𞋒𞋜𞋃𞋐",
+    "scriptName": "𞋒𞋜𞋃𞋐",
+    "scriptNameEnglish": "Wancho",
+    "qbfText": "",
+    "isoLang": "",
+    "isoBcp47": "nnp"
+  }
+}

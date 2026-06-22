@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -44,24 +45,31 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fontbook.app.model.FontItem
+import com.fontbook.app.model.ScriptTagInfo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BrowseScreen(
     fonts: List<FontItem>?,
+    scriptCatalog: Map<String, ScriptTagInfo>,
+    settings: AppSettings,
     custom: CustomTextState,
     listState: LazyListState,
     onFontClick: (FontItem) -> Unit,
+    onSettingsClick: () -> Unit,
 ) {
     var searchOpen by rememberSaveable { mutableStateOf(false) }
     var query by rememberSaveable { mutableStateOf("") }
 
-    val filtered = remember(fonts, query) {
+    val filtered = remember(fonts, query, scriptCatalog, settings.hiddenScriptTags) {
         val q = query.trim().lowercase()
+        val visibleFonts = fonts?.filterNot { font ->
+            font.supportedScriptTags.any { it in settings.hiddenScriptTags }
+        }
         when {
             fonts == null -> null
-            q.isEmpty() -> fonts
-            else -> fonts.filter { it.searchKey.contains(q) }
+            q.isEmpty() -> visibleFonts
+            else -> visibleFonts?.filter { it.matches(q, scriptCatalog) }
         }
     }
 
@@ -86,7 +94,11 @@ fun BrowseScreen(
                         )
                         if (fonts != null) {
                             Text(
-                                text = "${fonts.size} fonts on this device",
+                                text = if (filtered != null && filtered.size != fonts.size) {
+                                    "${filtered.size} of ${fonts.size} fonts"
+                                } else {
+                                    "${fonts.size} fonts on this device"
+                                },
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -104,6 +116,9 @@ fun BrowseScreen(
                                 MaterialTheme.colorScheme.onSurfaceVariant
                             },
                         )
+                    }
+                    IconButton(onClick = onSettingsClick) {
+                        Icon(Icons.Filled.Settings, contentDescription = "Settings")
                     }
                     IconButton(onClick = {
                         searchOpen = !searchOpen
@@ -132,6 +147,8 @@ fun BrowseScreen(
                 filtered.isEmpty() -> EmptyState(query = query)
                 else -> FontList(
                     fonts = filtered,
+                    scriptCatalog = scriptCatalog,
+                    settings = settings,
                     custom = custom,
                     listState = listState,
                     onFontClick = onFontClick,
@@ -161,6 +178,8 @@ private fun SearchField(query: String, onQueryChange: (String) -> Unit) {
 @Composable
 private fun FontList(
     fonts: List<FontItem>,
+    scriptCatalog: Map<String, ScriptTagInfo>,
+    settings: AppSettings,
     custom: CustomTextState,
     listState: LazyListState,
     onFontClick: (FontItem) -> Unit,
@@ -171,7 +190,13 @@ private fun FontList(
         contentPadding = PaddingValues(vertical = 4.dp),
     ) {
         items(fonts, key = { it.file.path }) { font ->
-            FontRow(font = font, custom = custom, onClick = { onFontClick(font) })
+            FontRow(
+                font = font,
+                scriptCatalog = scriptCatalog,
+                settings = settings,
+                custom = custom,
+                onClick = { onFontClick(font) },
+            )
             HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
         }
     }
@@ -180,10 +205,15 @@ private fun FontList(
 @Composable
 private fun FontRow(
     font: FontItem,
+    scriptCatalog: Map<String, ScriptTagInfo>,
+    settings: AppSettings,
     custom: CustomTextState,
     onClick: () -> Unit,
 ) {
     val family: FontFamily = rememberFontFamily(font)
+    val scripts = remember(font.supportedScriptTags, scriptCatalog) {
+        font.scriptSummary(scriptCatalog)
+    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -197,9 +227,27 @@ private fun FontRow(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
-        val sampleText = custom.text.ifBlank { Samples.PANGRAM }
+        if (scripts != null) {
+            Text(
+                text = scripts,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = 2.dp),
+            )
+        }
+        val localizedSample = remember(font.supportedScriptTags, scriptCatalog) {
+            font.localizedSample(scriptCatalog)
+        }
+        val defaultSample = if (settings.preferLocalizedSample) {
+            localizedSample ?: Samples.PANGRAM
+        } else {
+            Samples.PANGRAM
+        }
+        val sampleText = custom.text.ifBlank { defaultSample }
         Text(
-            text = if (custom.enabled) sampleText else Samples.PANGRAM,
+            text = if (custom.enabled) sampleText else defaultSample,
             fontFamily = family,
             fontSize = if (custom.enabled) custom.size.sp else 22.sp,
             color = MaterialTheme.colorScheme.onSurface,
@@ -211,6 +259,32 @@ private fun FontRow(
             overflow = if (custom.enabled) TextOverflow.Clip else TextOverflow.Ellipsis,
             modifier = Modifier.padding(top = 4.dp),
         )
+    }
+}
+
+private fun FontItem.localizedSample(scriptCatalog: Map<String, ScriptTagInfo>): String? =
+    supportedScriptTags
+        .asSequence()
+        .mapNotNull { scriptCatalog[it] }
+        .flatMap { sequenceOf(it) + it.alternates.asSequence() }
+        .mapNotNull { it.qbfText?.takeIf(String::isNotBlank) }
+        .firstOrNull()
+
+private fun FontItem.matches(query: String, scriptCatalog: Map<String, ScriptTagInfo>): Boolean =
+    searchKey.contains(query) || supportedScriptTags.any { tag ->
+        scriptCatalog[tag]?.searchKey?.contains(query) == true
+    }
+
+private fun FontItem.scriptSummary(scriptCatalog: Map<String, ScriptTagInfo>): String? {
+    if (supportedScriptTags.isEmpty()) return null
+    val names = supportedScriptTags
+        .map { tag -> scriptCatalog[tag]?.displayName ?: tag.uppercase() }
+        .distinct()
+    if (names.isEmpty()) return null
+    return if (names.size <= 4) {
+        names.joinToString(", ")
+    } else {
+        names.take(4).joinToString(", ") + " +${names.size - 4}"
     }
 }
 

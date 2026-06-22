@@ -51,6 +51,7 @@ object SystemFontScanner {
                     displayName = display,
                     family = family,
                     style = style,
+                    supportedScriptTags = OpenTypeScriptTags.read(file),
                 )
             }
         }

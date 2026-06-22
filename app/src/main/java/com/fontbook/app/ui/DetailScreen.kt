@@ -31,6 +31,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -40,6 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fontbook.app.model.FontItem
+import com.fontbook.app.model.ScriptTagInfo
 
 private val TABS = listOf("Sample", "Waterfall", "Glyphs", "Metrics", "Info", "Alphabet", "Custom")
 
@@ -47,6 +49,7 @@ private val TABS = listOf("Sample", "Waterfall", "Glyphs", "Metrics", "Info", "A
 @Composable
 fun DetailScreen(
     font: FontItem,
+    scriptCatalog: Map<String, ScriptTagInfo>,
     custom: CustomTextState,
     selectedTab: Int,
     onSelectTab: (Int) -> Unit,
@@ -96,7 +99,7 @@ fun DetailScreen(
             HorizontalDivider()
 
             when (selectedTab) {
-                0 -> SampleTab(family)
+                0 -> SampleTab(font, family, scriptCatalog)
                 1 -> WaterfallTab(family)
                 2 -> GlyphsTab(
                     family = family,
@@ -115,6 +118,7 @@ fun DetailScreen(
                 )
                 4 -> InfoTab(
                     font = font,
+                    scriptCatalog = scriptCatalog,
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState()),
@@ -127,7 +131,19 @@ fun DetailScreen(
 }
 
 @Composable
-private fun SampleTab(family: FontFamily) {
+private fun SampleTab(
+    font: FontItem,
+    family: FontFamily,
+    scriptCatalog: Map<String, ScriptTagInfo>,
+) {
+    val scriptSamples = remember(font.supportedScriptTags, scriptCatalog) {
+        font.supportedScriptTags
+            .mapNotNull { scriptCatalog[it] }
+            .flatMap { listOf(it) + it.alternates }
+            .filter { !it.qbfText.isNullOrBlank() }
+            .distinctBy { it.isoLang ?: it.isoBcp47 ?: it.langNameEnglish ?: it.tag }
+            .take(8)
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -139,6 +155,17 @@ private fun SampleTab(family: FontFamily) {
         Text(Samples.PANGRAM_SHORT, fontFamily = family, fontSize = 22.sp, color = MaterialTheme.colorScheme.onSurface)
         HorizontalDivider()
         Text(Samples.PARAGRAPH, fontFamily = family, fontSize = 18.sp, color = MaterialTheme.colorScheme.onSurface)
+        if (scriptSamples.isNotEmpty()) {
+            HorizontalDivider()
+            scriptSamples.forEach { script ->
+                SpecimenBlock(
+                    label = script.languageLabel ?: script.displayName,
+                    text = script.qbfText.orEmpty(),
+                    family = family,
+                    size = 24.sp,
+                )
+            }
+        }
     }
 }
 

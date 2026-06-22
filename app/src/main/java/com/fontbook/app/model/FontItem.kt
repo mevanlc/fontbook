@@ -16,11 +16,13 @@ data class FontItem(
     val displayName: String,
     val family: String,
     val style: String,
+    val supportedScriptTags: List<String>,
 ) {
     val typeface: Typeface by lazy {
         runCatching { Typeface.createFromFile(file) }.getOrDefault(Typeface.DEFAULT)
     }
 
     /** Lowercase haystack used for search matching. */
-    val searchKey: String = "$displayName $family $style ${file.name}".lowercase()
+    val searchKey: String = "$displayName $family $style ${file.name} ${supportedScriptTags.joinToString(" ")}"
+        .lowercase()
 }

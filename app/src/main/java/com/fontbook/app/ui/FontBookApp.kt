@@ -16,22 +16,42 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import com.fontbook.app.data.ScriptTagCatalog
 import com.fontbook.app.data.SystemFontScanner
 import com.fontbook.app.model.FontItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+private enum class AppScreen {
+    Browse,
+    Settings,
+    ScriptFilter,
+}
+
+private sealed interface AppRoute {
+    data object Browse : AppRoute
+    data object Settings : AppRoute
+    data object ScriptFilter : AppRoute
+    data class Detail(val font: FontItem) : AppRoute
+}
+
 @Composable
 fun FontBookApp() {
+    val context = LocalContext.current
+    val scriptCatalog = remember(context) { ScriptTagCatalog.load(context) }
+
     // null => still scanning.
     val fonts by produceState<List<FontItem>?>(initialValue = null) {
         value = withContext(Dispatchers.IO) { SystemFontScanner.scan() }
     }
 
     var selectedPath by rememberSaveable { mutableStateOf<String?>(null) }
+    var screen by rememberSaveable { mutableStateOf(AppScreen.Browse) }
 
     // Hoisted custom-text state, shared between Browse and Detail.
     val custom = rememberCustomTextState()
+    val settings = rememberAppSettings()
 
     // Plain `remember` (not saveable): survives navigation between the list and a
     // font's detail, but resets on app restart, per the requested behavior.
@@ -44,24 +64,52 @@ fun FontBookApp() {
     }
 
     BackHandler(enabled = selected != null) { selectedPath = null }
+    BackHandler(enabled = selected == null && screen == AppScreen.ScriptFilter) {
+        screen = AppScreen.Settings
+    }
+    BackHandler(enabled = selected == null && screen == AppScreen.Settings) {
+        screen = AppScreen.Browse
+    }
+
+    val route = selected?.let(AppRoute::Detail) ?: when (screen) {
+        AppScreen.Browse -> AppRoute.Browse
+        AppScreen.Settings -> AppRoute.Settings
+        AppScreen.ScriptFilter -> AppRoute.ScriptFilter
+    }
 
     AnimatedContent(
-        targetState = selected,
+        targetState = route,
         transitionSpec = {
             (fadeIn() togetherWith fadeOut()).using(SizeTransform(clip = false))
         },
         label = "screen",
-    ) { current ->
-        if (current == null) {
-            BrowseScreen(
+    ) { currentRoute ->
+        when (currentRoute) {
+            AppRoute.Browse -> BrowseScreen(
                 fonts = fonts,
+                scriptCatalog = scriptCatalog,
+                settings = settings,
                 custom = custom,
                 listState = listState,
                 onFontClick = { selectedPath = it.file.path },
+                onSettingsClick = { screen = AppScreen.Settings },
             )
-        } else {
-            DetailScreen(
-                font = current,
+            AppRoute.Settings -> SettingsScreen(
+                settings = settings,
+                hiddenScriptCount = settings.hiddenScriptTags.size,
+                onBack = { screen = AppScreen.Browse },
+                onScriptFilterClick = { screen = AppScreen.ScriptFilter },
+            )
+            AppRoute.ScriptFilter -> ScriptFilterScreen(
+                fonts = fonts.orEmpty(),
+                scriptCatalog = scriptCatalog,
+                hiddenScriptTags = settings.hiddenScriptTags,
+                onHiddenScriptTagsChange = { settings.hiddenScriptTags = it },
+                onBack = { screen = AppScreen.Settings },
+            )
+            is AppRoute.Detail -> DetailScreen(
+                font = currentRoute.font,
+                scriptCatalog = scriptCatalog,
                 custom = custom,
                 selectedTab = detailTab,
                 onSelectTab = { detailTab = it },
@@ -70,6 +118,33 @@ fun FontBookApp() {
         }
     }
 }
+
+class AppSettings(
+    preferLocalizedSample: Boolean,
+    hiddenScriptTags: Set<String>,
+) {
+    var preferLocalizedSample by mutableStateOf(preferLocalizedSample)
+    var hiddenScriptTags by mutableStateOf(hiddenScriptTags)
+
+    companion object {
+        val Saver: Saver<AppSettings, List<Any>> = Saver(
+            save = { listOf(it.preferLocalizedSample, it.hiddenScriptTags.toList()) },
+            restore = {
+                @Suppress("UNCHECKED_CAST")
+                AppSettings(
+                    preferLocalizedSample = it[0] as Boolean,
+                    hiddenScriptTags = (it[1] as List<String>).toSet(),
+                )
+            },
+        )
+    }
+}
+
+@Composable
+fun rememberAppSettings(): AppSettings =
+    rememberSaveable(saver = AppSettings.Saver) {
+        AppSettings(preferLocalizedSample = true, hiddenScriptTags = emptySet())
+    }
 
 /** Mutable holder for the global custom-text showcase mode. */
 class CustomTextState(

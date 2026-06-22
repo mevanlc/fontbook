@@ -1,8 +1,11 @@
 package com.fontbook.app.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,11 +20,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.fontbook.app.data.FontBoxReader
 import com.fontbook.app.model.FontItem
 import com.fontbook.app.model.FontMetadata
+import com.fontbook.app.model.ScriptTagInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -32,8 +38,15 @@ private sealed interface MetaState {
     data object Failed : MetaState
 }
 
+private data class InfoLine(val label: String, val value: String)
+
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun InfoTab(font: FontItem, modifier: Modifier = Modifier) {
+fun InfoTab(
+    font: FontItem,
+    scriptCatalog: Map<String, ScriptTagInfo>,
+    modifier: Modifier = Modifier,
+) {
     val state by produceState<MetaState>(initialValue = MetaState.Loading, key1 = font.file.path) {
         value = withContext(Dispatchers.IO) {
             FontBoxReader.read(font.file)?.let(MetaState::Ready) ?: MetaState.Failed
@@ -50,49 +63,52 @@ fun InfoTab(font: FontItem, modifier: Modifier = Modifier) {
                 Text("Reading metadata…", style = MaterialTheme.typography.bodyMedium)
             }
         }
-        MetaState.Failed -> UnreadableInfo(font, modifier)
+        MetaState.Failed -> UnreadableInfo(font, scriptCatalog, modifier)
         is MetaState.Ready -> {
             val data = s.data
-            Column(modifier = modifier.padding(16.dp)) {
-            Section("Identity")
-            InfoRow("Family", data.family)
-            InfoRow("Style", data.subfamily)
-            InfoRow("Full name", data.fullName)
-            InfoRow("PostScript", data.postScriptName)
-            InfoRow("Version", data.version)
+            val lines = infoLines(data, font, scriptCatalog)
+            CopyableInfoColumn(lines = lines, modifier = modifier) {
+                Section("Identity")
+                InfoRow(lines, "Family")
+                InfoRow(lines, "Style")
+                InfoRow(lines, "Full name")
+                InfoRow(lines, "PostScript")
+                InfoRow(lines, "Version")
 
-            SectionDivider()
-            Section("Design")
-            InfoRow("Foundry", foundry(data))
-            InfoRow("Designer", data.designer)
-            InfoRow("Weight", data.weightClass)
-            InfoRow("Width", data.widthClass)
-            InfoRow("Classification", data.familyClass)
-            InfoRow("PANOSE", data.panoseFamily)
+                SectionDivider()
+                Section("Design")
+                InfoRow(lines, "Foundry")
+                InfoRow(lines, "Designer")
+                InfoRow(lines, "Weight")
+                InfoRow(lines, "Width")
+                InfoRow(lines, "Classification")
+                InfoRow(lines, "PANOSE")
 
-            SectionDivider()
-            Section("Technical")
-            InfoRow("Format", data.format)
-            InfoRow("Glyphs", data.numGlyphs?.toString())
-            InfoRow("Units / em", data.unitsPerEm?.toString())
-            InfoRow("Embedding", data.embedding)
-            InfoRow("Created", data.created)
-            InfoRow("Modified", data.modified)
+                ScriptSection(lines)
 
-            SectionDivider()
-            Section("Legal")
-            InfoRow("Copyright", data.copyright)
-            InfoRow("Trademark", data.trademark)
-            InfoRow("License", data.license)
-            InfoRow("License URL", data.licenseUrl)
-            InfoRow("Vendor URL", data.vendorUrl)
-            InfoRow("Designer URL", data.designerUrl)
+                SectionDivider()
+                Section("Technical")
+                InfoRow(lines, "Format")
+                InfoRow(lines, "Glyphs")
+                InfoRow(lines, "Units / em")
+                InfoRow(lines, "Embedding")
+                InfoRow(lines, "Created")
+                InfoRow(lines, "Modified")
 
-            SectionDivider()
-            Section("File")
-            InfoRow("Name", data.fileName)
-            InfoRow("Path", data.filePath)
-            InfoRow("Size", formatSize(data.fileSizeBytes))
+                SectionDivider()
+                Section("Legal")
+                InfoRow(lines, "Copyright")
+                InfoRow(lines, "Trademark")
+                InfoRow(lines, "License")
+                InfoRow(lines, "License URL")
+                InfoRow(lines, "Vendor URL")
+                InfoRow(lines, "Designer URL")
+
+                SectionDivider()
+                Section("File")
+                InfoRow(lines, "Name")
+                InfoRow(lines, "Path")
+                InfoRow(lines, "Size")
             }
         }
     }
@@ -103,11 +119,18 @@ fun InfoTab(font: FontItem, modifier: Modifier = Modifier) {
  * lack a `glyf`/`loca` table). We still surface the file basics we already hold.
  */
 @Composable
-private fun UnreadableInfo(font: FontItem, modifier: Modifier = Modifier) {
-    Column(modifier = modifier.padding(16.dp)) {
+private fun UnreadableInfo(
+    font: FontItem,
+    scriptCatalog: Map<String, ScriptTagInfo>,
+    modifier: Modifier = Modifier,
+) {
+    val lines = fallbackInfoLines(font, scriptCatalog)
+    CopyableInfoColumn(lines = lines, modifier = modifier) {
         Section("Identity")
-        InfoRow("Family", font.family)
-        InfoRow("Style", font.style)
+        InfoRow(lines, "Family")
+        InfoRow(lines, "Style")
+
+        ScriptSection(lines)
 
         SectionDivider()
         Section("Technical")
@@ -120,9 +143,22 @@ private fun UnreadableInfo(font: FontItem, modifier: Modifier = Modifier) {
 
         SectionDivider()
         Section("File")
-        InfoRow("Name", font.file.name)
-        InfoRow("Path", font.file.path)
-        InfoRow("Size", formatSize(font.file.length()))
+        InfoRow(lines, "Name")
+        InfoRow(lines, "Path")
+        InfoRow(lines, "Size")
+    }
+}
+
+@Composable
+private fun ScriptSection(lines: List<InfoLine>) {
+    val scriptLines = lines.dropWhile { it.label != "Layout tags" }
+        .takeWhile { it.label == "Layout tags" || it.label.length == 4 }
+    if (scriptLines.isEmpty()) return
+
+    SectionDivider()
+    Section("Scripts")
+    scriptLines.forEach { line ->
+        InfoRow(line)
     }
 }
 
@@ -158,11 +194,26 @@ private fun SectionDivider() {
 
 /** Renders a label/value pair, or nothing when the value is absent. */
 @Composable
-private fun InfoRow(label: String, value: String?) {
-    if (value.isNullOrBlank()) return
-    Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+private fun InfoRow(lines: List<InfoLine>, label: String) {
+    val line = lines.firstOrNull { it.label == label } ?: return
+    InfoRow(line)
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun InfoRow(line: InfoLine) {
+    val clipboard = LocalClipboardManager.current
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .combinedClickable(
+                onClick = {},
+                onLongClick = { clipboard.copy(line.copyText()) },
+            )
+            .padding(vertical = 4.dp),
+    ) {
         Text(
-            text = label,
+            text = line.label,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
@@ -170,13 +221,117 @@ private fun InfoRow(label: String, value: String?) {
             modifier = Modifier.width(110.dp),
         )
         Text(
-            text = value,
+            text = line.value,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.fillMaxWidth(),
         )
     }
 }
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun CopyableInfoColumn(
+    lines: List<InfoLine>,
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val clipboard = LocalClipboardManager.current
+    Column(
+        modifier = modifier
+            .combinedClickable(
+                onClick = {},
+                onLongClick = { clipboard.copyAll(lines) },
+            )
+            .padding(16.dp),
+        content = content,
+    )
+}
+
+private fun infoLines(
+    data: FontMetadata,
+    font: FontItem,
+    scriptCatalog: Map<String, ScriptTagInfo>,
+): List<InfoLine> = buildList {
+    addOptional("Family", data.family)
+    addOptional("Style", data.subfamily)
+    addOptional("Full name", data.fullName)
+    addOptional("PostScript", data.postScriptName)
+    addOptional("Version", data.version)
+
+    addOptional("Foundry", foundry(data))
+    addOptional("Designer", data.designer)
+    addOptional("Weight", data.weightClass)
+    addOptional("Width", data.widthClass)
+    addOptional("Classification", data.familyClass)
+    addOptional("PANOSE", data.panoseFamily)
+
+    addScriptLines(font, scriptCatalog)
+
+    addOptional("Format", data.format)
+    addOptional("Glyphs", data.numGlyphs?.toString())
+    addOptional("Units / em", data.unitsPerEm?.toString())
+    addOptional("Embedding", data.embedding)
+    addOptional("Created", data.created)
+    addOptional("Modified", data.modified)
+
+    addOptional("Copyright", data.copyright)
+    addOptional("Trademark", data.trademark)
+    addOptional("License", data.license)
+    addOptional("License URL", data.licenseUrl)
+    addOptional("Vendor URL", data.vendorUrl)
+    addOptional("Designer URL", data.designerUrl)
+
+    add(InfoLine("Name", data.fileName))
+    add(InfoLine("Path", data.filePath))
+    add(InfoLine("Size", formatSize(data.fileSizeBytes)))
+}
+
+private fun fallbackInfoLines(
+    font: FontItem,
+    scriptCatalog: Map<String, ScriptTagInfo>,
+): List<InfoLine> = buildList {
+    addOptional("Family", font.family)
+    addOptional("Style", font.style)
+    addScriptLines(font, scriptCatalog)
+    add(InfoLine("Name", font.file.name))
+    add(InfoLine("Path", font.file.path))
+    add(InfoLine("Size", formatSize(font.file.length())))
+}
+
+private fun MutableList<InfoLine>.addScriptLines(
+    font: FontItem,
+    scriptCatalog: Map<String, ScriptTagInfo>,
+) {
+    if (font.supportedScriptTags.isEmpty()) return
+    add(InfoLine("Layout tags", font.supportedScriptTags.joinToString(", ") { it.uppercase() }))
+    font.supportedScriptTags.forEach { tag ->
+        val script = scriptCatalog[tag]
+        add(
+            InfoLine(
+                label = tag.uppercase(),
+                value = script?.let {
+                    listOfNotNull(it.displayName, it.languageLabel?.let { label -> "($label)" })
+                        .joinToString(" ")
+                } ?: "Unknown script",
+            ),
+        )
+    }
+}
+
+private fun MutableList<InfoLine>.addOptional(label: String, value: String?) {
+    if (!value.isNullOrBlank()) add(InfoLine(label, value))
+}
+
+private fun androidx.compose.ui.platform.ClipboardManager.copy(line: String) {
+    setText(AnnotatedString(line))
+}
+
+private fun androidx.compose.ui.platform.ClipboardManager.copyAll(lines: List<InfoLine>) {
+    setText(AnnotatedString(lines.joinToString("\n") { it.copyText() }))
+}
+
+private fun InfoLine.copyText(): String = "$label: $value"
 
 private fun formatSize(bytes: Long): String = when {
     bytes >= 1_000_000 -> String.format(java.util.Locale.US, "%.1f MB", bytes / 1_000_000.0)
