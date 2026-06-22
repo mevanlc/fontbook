@@ -14,6 +14,7 @@ object OpenTypeScriptTags {
 
     private const val TAG_TTCF = 0x74746366 // 'ttcf'
     private val LAYOUT_TABLES = setOf("GSUB", "GPOS")
+    private val LEGACY_SUPPORT_TAGS = setOf("latn", "grek", "cyrl")
 
     fun read(file: File): List<String> = try {
         RandomAccessFile(file, "r").use { raf ->
@@ -57,9 +58,19 @@ object OpenTypeScriptTags {
             raf.readFully(data)
             tags += parseLayoutTable(data)
         }
-        return tags
+        return orderTags(tags
             .filterNot { it.equals("dflt", ignoreCase = true) }
-            .sorted()
+            .sorted())
+    }
+
+    private fun orderTags(tags: List<String>): List<String> {
+        val hasLegacyCluster = LEGACY_SUPPORT_TAGS.all { it in tags }
+        if (!hasLegacyCluster) return tags
+
+        val purposeTags = tags.filterNot { it in LEGACY_SUPPORT_TAGS }
+        if (purposeTags.isEmpty()) return tags
+
+        return purposeTags + tags.filter { it in LEGACY_SUPPORT_TAGS }
     }
 
     private fun parseLayoutTable(data: ByteArray): List<String> {

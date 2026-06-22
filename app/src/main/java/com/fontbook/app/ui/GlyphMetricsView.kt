@@ -106,9 +106,17 @@ fun GlyphMetricsView(
     modifier: Modifier = Modifier,
 ) {
     val metrics = remember(font.file.path, glyph) { computeGlyphMetrics(font, glyph) }
+    val glyphName = remember(glyph) { glyph.unicodeNameLabel() }
 
     Column(modifier = modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         GlyphSelector(glyph = glyph, onGlyphChange = onGlyphChange)
+        if (glyphName != null) {
+            Text(
+                text = glyphName,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
         MetricsCanvas(metrics = metrics, font = font)
         Text(
             text = "Units per em: ${metrics.unitsPerEm}",
@@ -125,9 +133,7 @@ private fun GlyphSelector(glyph: String, onGlyphChange: (String) -> Unit) {
         OutlinedTextField(
             value = glyph,
             onValueChange = { value ->
-                // Keep a single character; take the most recently typed one.
-                value.lastOrNull()?.let { onGlyphChange(it.toString()) }
-                if (value.isEmpty()) onGlyphChange("")
+                onGlyphChange(value.lastCodePointText())
             },
             label = { Text("Glyph") },
             singleLine = true,
@@ -143,6 +149,27 @@ private fun GlyphSelector(glyph: String, onGlyphChange: (String) -> Unit) {
             }
         }
     }
+}
+
+private fun String.lastCodePointText(): String {
+    if (isEmpty()) return ""
+    val offset = offsetByCodePoints(length, -1)
+    return substring(offset)
+}
+
+private fun String.unicodeNameLabel(): String? {
+    if (isEmpty()) return null
+
+    val labels = ArrayList<String>()
+    var index = 0
+    while (index < length) {
+        val codePoint = codePointAt(index)
+        val code = "U+${codePoint.toString(16).uppercase().padStart(4, '0')}"
+        val name = runCatching { Character.getName(codePoint) }.getOrNull()
+        labels += if (name.isNullOrBlank()) code else "$code $name"
+        index += Character.charCount(codePoint)
+    }
+    return labels.joinToString(" + ")
 }
 
 @Composable

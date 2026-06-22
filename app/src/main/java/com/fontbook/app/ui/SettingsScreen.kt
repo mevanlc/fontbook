@@ -89,6 +89,8 @@ fun ScriptFilterScreen(
         .flatMap { it.supportedScriptTags }
         .distinct()
         .sortedWith(compareBy({ scriptCatalog[it]?.displayName ?: it.uppercase() }, { it }))
+    val allScriptTags = scriptRows.toSet()
+    val allSelected = hiddenScriptTags.none { it in allScriptTags }
 
     Scaffold(
         topBar = {
@@ -109,8 +111,13 @@ fun ScriptFilterScreen(
         ) {
             item {
                 SelectAllRow(
-                    checked = hiddenScriptTags.isEmpty(),
-                    onClick = { onHiddenScriptTagsChange(emptySet()) },
+                    checked = allSelected,
+                    label = if (allSelected) "Select none" else "Select all",
+                    onClick = {
+                        onHiddenScriptTagsChange(
+                            if (allSelected) hiddenScriptTags + allScriptTags else hiddenScriptTags - allScriptTags,
+                        )
+                    },
                 )
                 HorizontalDivider()
             }
@@ -188,6 +195,7 @@ private fun SettingNavRow(
 @Composable
 private fun SelectAllRow(
     checked: Boolean,
+    label: String,
     onClick: () -> Unit,
 ) {
     Row(
@@ -199,7 +207,7 @@ private fun SelectAllRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Checkbox(checked = checked, onCheckedChange = { onClick() })
-        Text(text = "Select all", style = MaterialTheme.typography.bodyLarge)
+        Text(text = label, style = MaterialTheme.typography.bodyLarge)
     }
 }
 

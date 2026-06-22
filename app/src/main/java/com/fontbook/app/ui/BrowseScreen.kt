@@ -29,6 +29,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +37,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -60,6 +64,15 @@ fun BrowseScreen(
 ) {
     var searchOpen by rememberSaveable { mutableStateOf(false) }
     var query by rememberSaveable { mutableStateOf("") }
+    val searchFocusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(searchOpen) {
+        if (searchOpen) {
+            searchFocusRequester.requestFocus()
+            keyboardController?.show()
+        }
+    }
 
     val filtered = remember(fonts, query, scriptCatalog, settings.hiddenScriptTags) {
         val q = query.trim().lowercase()
@@ -117,26 +130,34 @@ fun BrowseScreen(
                             },
                         )
                     }
-                    IconButton(onClick = onSettingsClick) {
-                        Icon(Icons.Filled.Settings, contentDescription = "Settings")
-                    }
                     IconButton(onClick = {
-                        searchOpen = !searchOpen
-                        if (!searchOpen) query = ""
+                        if (searchOpen) {
+                            searchOpen = false
+                            query = ""
+                        } else {
+                            searchOpen = true
+                        }
                     }) {
                         Icon(
                             if (searchOpen) Icons.Filled.Close else Icons.Filled.Search,
                             contentDescription = if (searchOpen) "Close search" else "Search",
                         )
                     }
+                    IconButton(onClick = onSettingsClick) {
+                        Icon(Icons.Filled.Settings, contentDescription = "Settings")
+                    }
                 },
             )
         },
     ) { padding ->
-        Column(modifier = Modifier.padding(padding)) {
-            if (searchOpen) {
-                SearchField(query = query, onQueryChange = { query = it })
-            }
+            Column(modifier = Modifier.padding(padding)) {
+                if (searchOpen) {
+                    SearchField(
+                        query = query,
+                        onQueryChange = { query = it },
+                        focusRequester = searchFocusRequester,
+                    )
+                }
             if (custom.enabled) {
                 CustomTextPanel(custom = custom)
             }
@@ -160,11 +181,18 @@ fun BrowseScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SearchField(query: String, onQueryChange: (String) -> Unit) {
+private fun SearchField(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    focusRequester: FocusRequester,
+) {
     TextField(
         value = query,
         onValueChange = onQueryChange,
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .focusRequester(focusRequester)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
         placeholder = { Text("Search fonts") },
         leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
         singleLine = true,

@@ -31,6 +31,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -40,10 +41,13 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.fontbook.app.data.OpenTypeGlyphs
 import com.fontbook.app.model.FontItem
 import com.fontbook.app.model.ScriptTagInfo
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-private val TABS = listOf("Sample", "Waterfall", "Glyphs", "Metrics", "Info", "Alphabet", "Custom")
+private val TABS = listOf("Sample", "Info", "Waterfall", "Glyphs", "Metrics", "Alphabet", "Custom")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -100,25 +104,26 @@ fun DetailScreen(
 
             when (selectedTab) {
                 0 -> SampleTab(font, family, scriptCatalog)
-                1 -> WaterfallTab(family)
-                2 -> GlyphsTab(
+                1 -> InfoTab(
+                    font = font,
+                    scriptCatalog = scriptCatalog,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
+                )
+                2 -> WaterfallTab(family)
+                3 -> GlyphsTab(
+                    font = font,
                     family = family,
                     onGlyphClick = { glyph ->
                         focusGlyph = glyph
                         onSelectTab(TABS.indexOf("Metrics"))
                     },
                 )
-                3 -> GlyphMetricsView(
+                4 -> GlyphMetricsView(
                     font = font,
                     glyph = focusGlyph,
                     onGlyphChange = { focusGlyph = it },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState()),
-                )
-                4 -> InfoTab(
-                    font = font,
-                    scriptCatalog = scriptCatalog,
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState()),
@@ -205,34 +210,63 @@ private fun WaterfallTab(family: FontFamily) {
 }
 
 @Composable
-private fun GlyphsTab(family: FontFamily, onGlyphClick: (String) -> Unit) {
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 60.dp),
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(12.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        items(Samples.GLYPHS) { glyph ->
-            Surface(
-                shape = RoundedCornerShape(8.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                onClick = { onGlyphClick(glyph) },
-                modifier = Modifier.fillMaxWidth(),
+private fun GlyphsTab(
+    font: FontItem,
+    family: FontFamily,
+    onGlyphClick: (String) -> Unit,
+) {
+    val glyphs by produceState<List<OpenTypeGlyphs.Glyph>?>(initialValue = null, key1 = font.file.path) {
+        value = withContext(Dispatchers.IO) { OpenTypeGlyphs.read(font.file) }
+    }
+
+    when (val currentGlyphs = glyphs) {
+        null -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(
+                text = "Reading glyphs...",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        else -> {
+            val displayGlyphs = currentGlyphs.ifEmpty {
+                Samples.GLYPHS.map { glyph -> OpenTypeGlyphs.Glyph(glyph.codePointAt(0)) }
+            }
+
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(minSize = 60.dp),
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 14.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = glyph,
-                        fontFamily = family,
-                        fontSize = 28.sp,
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
+                items(displayGlyphs, key = { it.codePoint }) { glyph ->
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        onClick = { onGlyphClick(glyph.text) },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 10.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            Text(
+                                text = glyph.text,
+                                fontFamily = family,
+                                fontSize = 28.sp,
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                            Text(
+                                text = glyph.label,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                            )
+                        }
+                    }
                 }
             }
         }
