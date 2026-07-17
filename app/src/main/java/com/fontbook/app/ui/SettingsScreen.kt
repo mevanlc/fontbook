@@ -57,6 +57,13 @@ fun SettingsScreen(
                 .padding(padding),
         ) {
             SettingSwitchRow(
+                title = "Group font families",
+                subtitle = "Collapse related styles into expandable families",
+                checked = settings.groupFontFamilies,
+                onCheckedChange = { settings.groupFontFamilies = it },
+            )
+            HorizontalDivider()
+            SettingSwitchRow(
                 title = "Prefer localized sample",
                 subtitle = "Use localized pangrams in the font list when available",
                 checked = settings.preferLocalizedSample,

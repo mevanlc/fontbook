@@ -57,6 +57,12 @@ fun FontBookApp() {
     // font's detail, but resets on app restart, per the requested behavior.
     val listState = rememberLazyListState()
     var detailTab by remember { mutableIntStateOf(0) }
+    var expandedFamilyKeys by rememberSaveable(
+        stateSaver = Saver<Set<String>, ArrayList<String>>(
+            save = { ArrayList(it) },
+            restore = { it.toSet() },
+        ),
+    ) { mutableStateOf(emptySet()) }
 
     val selected = remember(fonts, selectedPath) {
         val path = selectedPath
@@ -91,6 +97,14 @@ fun FontBookApp() {
                 settings = settings,
                 custom = custom,
                 listState = listState,
+                expandedFamilyKeys = expandedFamilyKeys,
+                onFamilyExpandedChange = { key, expanded ->
+                    expandedFamilyKeys = if (expanded) {
+                        expandedFamilyKeys + key
+                    } else {
+                        expandedFamilyKeys - key
+                    }
+                },
                 onFontClick = { selectedPath = it.file.path },
                 onSettingsClick = { screen = AppScreen.Settings },
             )
@@ -122,18 +136,21 @@ fun FontBookApp() {
 class AppSettings(
     preferLocalizedSample: Boolean,
     hiddenScriptTags: Set<String>,
+    groupFontFamilies: Boolean,
 ) {
     var preferLocalizedSample by mutableStateOf(preferLocalizedSample)
     var hiddenScriptTags by mutableStateOf(hiddenScriptTags)
+    var groupFontFamilies by mutableStateOf(groupFontFamilies)
 
     companion object {
         val Saver: Saver<AppSettings, List<Any>> = Saver(
-            save = { listOf(it.preferLocalizedSample, it.hiddenScriptTags.toList()) },
+            save = { listOf(it.preferLocalizedSample, it.hiddenScriptTags.toList(), it.groupFontFamilies) },
             restore = {
                 @Suppress("UNCHECKED_CAST")
                 AppSettings(
                     preferLocalizedSample = it[0] as Boolean,
                     hiddenScriptTags = (it[1] as List<String>).toSet(),
+                    groupFontFamilies = it.getOrNull(2) as? Boolean ?: true,
                 )
             },
         )
@@ -143,7 +160,11 @@ class AppSettings(
 @Composable
 fun rememberAppSettings(): AppSettings =
     rememberSaveable(saver = AppSettings.Saver) {
-        AppSettings(preferLocalizedSample = true, hiddenScriptTags = emptySet())
+        AppSettings(
+            preferLocalizedSample = true,
+            hiddenScriptTags = emptySet(),
+            groupFontFamilies = true,
+        )
     }
 
 /** Mutable holder for the global custom-text showcase mode. */

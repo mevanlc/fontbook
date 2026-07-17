@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Search
@@ -39,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -46,10 +48,13 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.fontbook.app.model.FontFamilyGroup
 import com.fontbook.app.model.FontItem
 import com.fontbook.app.model.ScriptTagInfo
+import com.fontbook.app.model.groupByFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,6 +64,8 @@ fun BrowseScreen(
     settings: AppSettings,
     custom: CustomTextState,
     listState: LazyListState,
+    expandedFamilyKeys: Set<String>,
+    onFamilyExpandedChange: (String, Boolean) -> Unit,
     onFontClick: (FontItem) -> Unit,
     onSettingsClick: () -> Unit,
 ) {
@@ -74,6 +81,12 @@ fun BrowseScreen(
         }
     }
 
+    LaunchedEffect(query) {
+        if (query.isNotBlank()) {
+            listState.scrollToItem(0)
+        }
+    }
+
     val filtered = remember(fonts, query, scriptCatalog, settings.hiddenScriptTags) {
         val q = query.trim().lowercase()
         val visibleFonts = fonts?.filterNot { font ->
@@ -85,6 +98,7 @@ fun BrowseScreen(
             else -> visibleFonts?.filter { it.matches(q, scriptCatalog) }
         }
     }
+    val familyGroups = remember(filtered) { filtered?.groupByFamily() }
 
     Scaffold(
         topBar = {
@@ -107,11 +121,12 @@ fun BrowseScreen(
                         )
                         if (fonts != null) {
                             Text(
-                                text = if (filtered != null && filtered.size != fonts.size) {
-                                    "${filtered.size} of ${fonts.size} fonts"
-                                } else {
-                                    "${fonts.size} fonts on this device"
-                                },
+                                text = fontCountSummary(
+                                    totalFontCount = fonts.size,
+                                    shownFontCount = filtered?.size ?: fonts.size,
+                                    familyCount = familyGroups?.size,
+                                    showFamilyCount = settings.groupFontFamilies,
+                                ),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -166,6 +181,16 @@ fun BrowseScreen(
             when {
                 filtered == null -> LoadingState()
                 filtered.isEmpty() -> EmptyState(query = query)
+                settings.groupFontFamilies && query.isBlank() -> GroupedFontList(
+                    groups = familyGroups.orEmpty(),
+                    scriptCatalog = scriptCatalog,
+                    settings = settings,
+                    custom = custom,
+                    listState = listState,
+                    expandedFamilyKeys = expandedFamilyKeys,
+                    onFamilyExpandedChange = onFamilyExpandedChange,
+                    onFontClick = onFontClick,
+                )
                 else -> FontList(
                     fonts = filtered,
                     scriptCatalog = scriptCatalog,
@@ -177,6 +202,23 @@ fun BrowseScreen(
             }
         }
     }
+}
+
+private fun fontCountSummary(
+    totalFontCount: Int,
+    shownFontCount: Int,
+    familyCount: Int?,
+    showFamilyCount: Boolean,
+): String {
+    val fontLabel = if (shownFontCount == totalFontCount) {
+        "$totalFontCount ${if (totalFontCount == 1) "font" else "fonts"}"
+    } else {
+        "$shownFontCount of $totalFontCount fonts"
+    }
+    if (!showFamilyCount || familyCount == null) {
+        return if (shownFontCount == totalFontCount) "$fontLabel on this device" else fontLabel
+    }
+    return "$fontLabel · $familyCount ${if (familyCount == 1) "family" else "families"}"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -231,8 +273,150 @@ private fun FontList(
 }
 
 @Composable
+private fun GroupedFontList(
+    groups: List<FontFamilyGroup>,
+    scriptCatalog: Map<String, ScriptTagInfo>,
+    settings: AppSettings,
+    custom: CustomTextState,
+    listState: LazyListState,
+    expandedFamilyKeys: Set<String>,
+    onFamilyExpandedChange: (String, Boolean) -> Unit,
+    onFontClick: (FontItem) -> Unit,
+) {
+    LazyColumn(
+        state = listState,
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(vertical = 4.dp),
+    ) {
+        groups.forEach { group ->
+            if (group.variants.size == 1) {
+                val font = group.variants.single()
+                item(key = "font:${font.file.path}") {
+                    FontRow(
+                        font = font,
+                        scriptCatalog = scriptCatalog,
+                        settings = settings,
+                        custom = custom,
+                        onClick = { onFontClick(font) },
+                    )
+                    HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
+                }
+            } else {
+                val expanded = group.key in expandedFamilyKeys
+                item(key = "family:${group.key}") {
+                    FontFamilyRow(
+                        group = group,
+                        scriptCatalog = scriptCatalog,
+                        settings = settings,
+                        custom = custom,
+                        expanded = expanded,
+                        onClick = { onFamilyExpandedChange(group.key, !expanded) },
+                    )
+                    HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
+                }
+                if (expanded) {
+                    items(group.variants, key = { "variant:${it.file.path}" }) { font ->
+                        FontRow(
+                            font = font,
+                            title = group.labelFor(font),
+                            horizontalStartPadding = 32.dp,
+                            scriptCatalog = scriptCatalog,
+                            settings = settings,
+                            custom = custom,
+                            onClick = { onFontClick(font) },
+                        )
+                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun FontFamilyRow(
+    group: FontFamilyGroup,
+    scriptCatalog: Map<String, ScriptTagInfo>,
+    settings: AppSettings,
+    custom: CustomTextState,
+    expanded: Boolean,
+    onClick: () -> Unit,
+) {
+    val font = group.representative
+    val family: FontFamily = rememberFontFamily(font)
+    val scripts = remember(font.supportedScriptTags, scriptCatalog) {
+        font.scriptSummary(scriptCatalog)
+    }
+    val localizedSample = remember(font.supportedScriptTags, scriptCatalog) {
+        font.localizedSample(scriptCatalog)
+    }
+    val defaultSample = if (settings.preferLocalizedSample) {
+        localizedSample ?: Samples.PANGRAM
+    } else {
+        Samples.PANGRAM
+    }
+    val sampleText = custom.text.ifBlank { defaultSample }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(start = 16.dp, end = 8.dp, top = 12.dp, bottom = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = group.displayName,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = buildString {
+                    append(group.variantSummary)
+                    scripts?.let {
+                        append(" · ")
+                        append(it)
+                    }
+                },
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = 2.dp),
+            )
+            Text(
+                text = if (custom.enabled) sampleText else defaultSample,
+                fontFamily = family,
+                fontSize = if (custom.enabled) custom.size.sp else 22.sp,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = if (custom.enabled) 1 else 3,
+                softWrap = !custom.enabled,
+                overflow = if (custom.enabled) TextOverflow.Clip else TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = 4.dp),
+            )
+        }
+        Icon(
+            Icons.AutoMirrored.Filled.ArrowForward,
+            contentDescription = if (expanded) {
+                "Collapse ${group.displayName}"
+            } else {
+                "Expand ${group.displayName}"
+            },
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier
+                .padding(8.dp)
+                .graphicsLayer { rotationZ = if (expanded) 90f else 0f },
+        )
+    }
+}
+
+@Composable
 private fun FontRow(
     font: FontItem,
+    title: String = font.displayName,
+    horizontalStartPadding: Dp = 16.dp,
     scriptCatalog: Map<String, ScriptTagInfo>,
     settings: AppSettings,
     custom: CustomTextState,
@@ -246,10 +430,10 @@ private fun FontRow(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(start = horizontalStartPadding, end = 16.dp, top = 12.dp, bottom = 12.dp),
     ) {
         Text(
-            text = font.displayName,
+            text = title,
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
