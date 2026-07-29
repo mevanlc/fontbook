@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Fontbook"
+rootProject.name = "FontBook"
 include(":app")

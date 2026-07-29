@@ -41,7 +41,7 @@ private val DarkColors = darkColorScheme(
 )
 
 @Composable
-fun FontbookTheme(
+fun FontBookTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {

@@ -8,14 +8,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.fontbook.app.ui.FontBookApp
-import com.fontbook.app.ui.theme.FontbookTheme
+import com.fontbook.app.ui.theme.FontBookTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent {
-            FontbookTheme {
+            FontBookTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     FontBookApp()
                 }
