@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500">
+  <rect width="1024" height="500" fill="#fbf9f5"/>
+  <circle cx="218" cy="250" r="142" fill="#2b2a28"/>
+  <path
+      fill="#f5f2ec"
+      fill-rule="evenodd"
+      d="m218 165 75 170h-36l-16-40h-46l-16 40h-36Zm0 61-15 36h30Z"/>
+  <text x="410" y="235" fill="#1c1b19" font-family="sans-serif" font-size="94" font-weight="600">FontBook</text>
+  <text x="414" y="303" fill="#6a655c" font-family="sans-serif" font-size="34">Explore the type on your device</text>
+  <path d="M414 337h438" stroke="#bdb8ad" stroke-width="3"/>
+  <text x="414" y="388" fill="#49463f" font-family="serif" font-size="36">Aa · 123 · &amp; · Ж · 文 · ع</text>
+</svg>

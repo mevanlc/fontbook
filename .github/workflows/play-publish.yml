@@ -1,0 +1,136 @@
+name: Publish to Google Play
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      destination:
+        description: Build only, or publish to a Google Play track
+        type: choice
+        options:
+          - artifact-only
+          - internal
+          - alpha
+          - beta
+          - production
+        default: artifact-only
+      release_status:
+        description: Google Play release status
+        type: choice
+        options:
+          - completed
+          - draft
+        default: completed
+      version_name:
+        description: Optional version name (defaults to 1.0.<workflow run>)
+        type: string
+        required: false
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: google-play-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: google-play-${{ inputs.destination || 'internal' }}
+    env:
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.PLAY_UPLOAD_STORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.PLAY_UPLOAD_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.PLAY_UPLOAD_KEY_PASSWORD }}
+      PLAY_DESTINATION: ${{ inputs.destination || 'internal' }}
+      PLAY_RELEASE_STATUS: ${{ inputs.release_status || 'completed' }}
+      REQUESTED_VERSION_NAME: ${{ inputs.version_name }}
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Java
+        uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6.0.0
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+
+      - name: Choose release version
+        shell: bash
+        run: |
+          version_code=$((GITHUB_RUN_NUMBER * 100 + GITHUB_RUN_ATTEMPT))
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            version_name="${GITHUB_REF_NAME#v}"
+          elif [[ -n "$REQUESTED_VERSION_NAME" ]]; then
+            version_name="$REQUESTED_VERSION_NAME"
+          else
+            version_name="1.0.${GITHUB_RUN_NUMBER}"
+          fi
+          echo "VERSION_CODE=$version_code" >> "$GITHUB_ENV"
+          echo "VERSION_NAME=$version_name" >> "$GITHUB_ENV"
+
+      - name: Restore upload keystore
+        env:
+          PLAY_UPLOAD_KEYSTORE_BASE64: ${{ secrets.PLAY_UPLOAD_KEYSTORE_BASE64 }}
+        shell: bash
+        run: |
+          if [[ -z "$PLAY_UPLOAD_KEYSTORE_BASE64" ]]; then
+            echo "PLAY_UPLOAD_KEYSTORE_BASE64 is not configured" >&2
+            exit 1
+          fi
+          keystore_path="$RUNNER_TEMP/fontbook-upload.jks"
+          printf '%s' "$PLAY_UPLOAD_KEYSTORE_BASE64" | base64 --decode > "$keystore_path"
+          chmod 600 "$keystore_path"
+          echo "ANDROID_KEYSTORE_PATH=$keystore_path" >> "$GITHUB_ENV"
+
+      - name: Test, lint, and build signed bundle
+        run: ./gradlew test lintRelease bundleRelease
+
+      - name: Verify bundle signature
+        shell: bash
+        run: |
+          verification=$(jarsigner -verify app/build/outputs/bundle/release/app-release.aab)
+          if [[ "$verification" != *"jar verified."* ]]; then
+            echo "$verification" >&2
+            exit 1
+          fi
+
+      - name: Save signed bundle
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: fontbook-${{ env.VERSION_NAME }}-${{ env.VERSION_CODE }}
+          path: app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Authenticate to Google Cloud
+        if: env.PLAY_DESTINATION != 'artifact-only'
+        id: google-auth
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_PLAY_SERVICE_ACCOUNT }}
+
+      - name: Upload to Google Play
+        if: env.PLAY_DESTINATION != 'artifact-only'
+        uses: r0adkll/upload-google-play@e738b9dd8f2476ea806d921b64aacd24f34515a5 # v1.1.5
+        with:
+          serviceAccountJson: ${{ steps.google-auth.outputs.credentials_file_path }}
+          packageName: org.mecresearch.fontbook
+          releaseFiles: app/build/outputs/bundle/release/app-release.aab
+          tracks: ${{ env.PLAY_DESTINATION }}
+          status: ${{ env.PLAY_RELEASE_STATUS }}
+          releaseName: ${{ env.VERSION_NAME }}
+          whatsNewDirectory: distribution/whatsnew
+
+      - name: Remove upload keystore
+        if: always()
+        shell: bash
+        run: rm -f "$ANDROID_KEYSTORE_PATH"

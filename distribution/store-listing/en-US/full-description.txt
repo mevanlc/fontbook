@@ -1,0 +1,13 @@
+FontBook is an offline type specimen and font inspector for Android.
+
+Browse the font families supplied by your device, search by name or supported script, and preview each typeface with multilingual samples or your own text.
+
+Explore each font in detail:
+
+- Sample text and a full size waterfall
+- Glyph repertoire and individual glyph metrics
+- Alphabet, numeral, and punctuation specimens
+- OpenType names, classifications, supported scripts, and file details
+- Family grouping and script filters
+
+FontBook has no ads, accounts, analytics, or network access. Font files and preview text stay on your device.

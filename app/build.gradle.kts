@@ -5,21 +5,63 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
+val releaseVersionCode = providers.environmentVariable("VERSION_CODE")
+    .orElse("1")
+    .map(String::toInt)
+val releaseVersionName = providers.environmentVariable("VERSION_NAME")
+    .orElse("1.0")
+
+val releaseKeystorePath = providers.environmentVariable("ANDROID_KEYSTORE_PATH").orNull
+val releaseKeystorePassword = providers.environmentVariable("ANDROID_KEYSTORE_PASSWORD").orNull
+val releaseKeyAlias = providers.environmentVariable("ANDROID_KEY_ALIAS").orNull
+val releaseKeyPassword = providers.environmentVariable("ANDROID_KEY_PASSWORD").orNull
+val releaseSigningConfigured = listOf(
+    releaseKeystorePath,
+    releaseKeystorePassword,
+    releaseKeyAlias,
+    releaseKeyPassword,
+).all { !it.isNullOrBlank() }
+
+val releaseBundleRequested = gradle.startParameter.taskNames.any { taskName ->
+    taskName.substringAfterLast(':').equals("bundleRelease", ignoreCase = true)
+}
+
+if (releaseBundleRequested && !releaseSigningConfigured) {
+    throw GradleException(
+        "bundleRelease requires ANDROID_KEYSTORE_PATH, ANDROID_KEYSTORE_PASSWORD, " +
+            "ANDROID_KEY_ALIAS, and ANDROID_KEY_PASSWORD",
+    )
+}
+
 android {
-    namespace = "com.fontbook.app"
-    compileSdk = 35
+    namespace = "org.mecresearch.fontbook"
+    compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.fontbook.app"
+        applicationId = "org.mecresearch.fontbook"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        targetSdk = 36
+        versionCode = releaseVersionCode.get()
+        versionName = releaseVersionName.get()
+    }
+
+    signingConfigs {
+        if (releaseSigningConfigured) {
+            create("release") {
+                storeFile = file(requireNotNull(releaseKeystorePath))
+                storePassword = releaseKeystorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+            }
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
+            if (releaseSigningConfigured) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
